@@ -1,0 +1,11 @@
+---
+title: Palmer Penguins Visualizations
+author: R package build
+date: '2022-02-09'
+slug: palmer-penguins-visualizations
+categories:
+  - R
+tags:
+  - Penguins
+  - GGPLOT2
+---
