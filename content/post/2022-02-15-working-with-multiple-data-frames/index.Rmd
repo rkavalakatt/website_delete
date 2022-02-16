@@ -1,0 +1,116 @@
+---
+title: Working with Multiple Data Frames
+author: ''
+date: '2022-02-15'
+slug: working-with-multiple-data-frames
+categories: []
+tags: []
+---
+##Libraries 
+```{r}
+library(tidyverse)
+```
+
+## Import top 10 women scientists
+
+```{r}
+url1 <- 'https://raw.githubusercontent.com/rkavalakatt/tidyverse/main/professions.csv'
+url2 <- 'https://raw.githubusercontent.com/rkavalakatt/tidyverse/main/dates.csv'
+url3 <- 'https://raw.githubusercontent.com/rkavalakatt/tidyverse/main/works.csv'
+professions <- read_csv(url1)
+dates <- read_csv(url2)
+works <- read_csv(url3)
+```
+## Left join dates / profession
+```{r}
+professions %>%
+  left_join(dates)
+```
+## Right join dates / professions data frames
+```{r}
+professions %>% 
+  right_join(dates)
+```
+
+## Full joining works / dates dataframes
+```{r}
+dates %>% 
+  full_join(works)
+```
+## works / dates dataframes inner join
+```{r}
+dates %>%
+    inner_join(works)
+```
+## works / dates dataframes Semi join 
+```{r}
+dates %>%
+  semi_join(works)
+```
+
+## works and dateframes Anti join
+```{r}
+dates %>%
+  anti_join(works)
+```
+
+## Join professions, dates, & works
+```{r}
+professions %>%
+  left_join(dates) %>%
+  left_join(works)
+```
+
+## Import student records
+
+```{r}
+url4 <- 'https://raw.githubusercontent.com/rkavalakatt/tidyverse/main/enrolment.csv'
+url5 <- 'https://raw.githubusercontent.com/rkavalakatt/tidyverse/main/survey.csv'
+enrolment <- read_csv(url4)
+survey <- read_csv(url5)
+```
+
+## Class student records
+```{r}
+enrolment %>%
+  left_join(survey, by = "id")
+```
+
+## Students surveyed missing student records
+```{r}
+enrolment %>%
+  anti_join(survey, by = "id")
+```
+
+## Students dropped student records
+
+```{r}
+survey %>%
+  anti_join(enrolment, by = "id")
+```
+
+## Import grocery sales dataframes
+
+```{r}
+url6 <- 'https://raw.githubusercontent.com/rkavalakatt/tidyverse/main/purchases.csv'
+url7 <- 'https://raw.githubusercontent.com/rkavalakatt/tidyverse/main/prices.csv'
+purchases <- read_csv(url6)
+prices <- read_csv(url7)
+```
+
+## Total revenue grocery salews
+
+```{r}
+purchases %>%
+    left_join(prices) %>%
+    summarise(total_revenue = sum(price))
+```
+
+## Revenue per customer grocery sales
+
+```{r}
+purchases %>%
+  left_join(prices) %>%
+  group_by(customer_id) %>%
+  summarise(total_revenue = sum(price))
+```
