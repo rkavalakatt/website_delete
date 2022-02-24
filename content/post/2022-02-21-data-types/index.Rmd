@@ -7,3 +7,62 @@ categories: []
 tags:
   - data types
 ---
+```{r}
+library(tidyverse)
+```
+##Load Catlovers Data
+```{r}
+catlovers <- "https://raw.githubusercontent.com/rkavalakatt/tidyverse/main/cat-lovers.csv"
+cat_lovers <- read_csv(catlovers)
+```
+## Running summarise fails due to non-numeric arguments
+```{r}
+cat_lovers %>%
+ summarise(mean_cats = mean(number_of_cats))
+```
+### DOES NOT FIX ERROR, Using the help command on mean shows that there is an argument that takes out NA values
+
+```{r}
+?mean
+cat_lovers %>%
+  summarise(mean_cats = mean(number_of_cats, na.rm = TRUE))
+```
+## type command shows data type mismatch
+```{r}
+glimpse(cat_lovers)
+```
+### Recieved chr instead so we must explicitly convert the data type
+```{r}
+cat_lovers %>%
+ mutate(number_of_cats = case_when(
+     name == "Ginger Clark"  ~ 2,
+     name == "Doug Bass"     ~ 3,
+     TRUE                    ~as.numeric (number_of_cats)
+    )) %>%
+  summarise(mean_cats = mean(number_of_cats))
+```
+### Convert data types after manipulating data to the same type
+```{r}
+cat_lovers %>%
+ mutate(number_of_cats = case_when(
+     name == "Ginger Clark"  ~ "2",
+     name == "Doug Bass"     ~ "3",
+     TRUE                    ~ number_of_cats
+    ),
+number_of_cats =  as.numeric(number_of_cats)
+) %>%
+  summarise(mean_cats = mean(number_of_cats))
+```
+## Save value to catlovers
+```{r}
+cat_lovers <- cat_lovers %>%
+ mutate(number_of_cats = case_when(
+     name == "Ginger Clark"  ~ "2",
+     name == "Doug Bass"     ~ "3",
+     TRUE                    ~ number_of_cats
+    ),
+number_of_cats =  as.numeric(number_of_cats)
+) %>%
+  summarise(mean_cats = mean(number_of_cats))
+```
+
