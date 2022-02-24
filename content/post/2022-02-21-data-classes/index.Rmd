@@ -38,6 +38,14 @@ cat_lovers %>%
 library(lubridate)
 hotel <- "https://raw.githubusercontent.com/rkavalakatt/tidyverse/main/hotels.csv"
 hotels <- read_csv(hotel)
+print(hotels)
+
+hotels_averaged <- hotels %>%
+  group_by(arrival_date_month)%>%
+  mutate(avg_monthly_ard = mean(adr))
+
+ggplot(hotels_averaged, aes(x = arrival_date_month, y = avg_monthly_ard)) +
+  geom_point()
 
 ```
 ##Calculate and visualise the number of bookings on any given arrival date
