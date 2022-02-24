@@ -6,3 +6,99 @@ slug: data-classes
 categories: []
 tags: []
 ---
+```{r}
+library(tidyverse)
+```
+
+##Load catlovers
+```{r}
+catlovers <- "https://raw.githubusercontent.com/rkavalakatt/tidyverse/main/cat-lovers.csv"
+cat_lovers <- read_csv(catlovers)
+```
+
+##Use glimpse on catlovers
+```{r}
+glimpse(cat_lovers)
+
+```
+##coerce when plotting
+```{r}
+ggplot(cat_lovers, mapping = aes(x = handedness)) +
+  geom_bar()
+```
+##Use forcats to manipulate factors
+```{r}
+cat_lovers %>%
+  mutate(handedness = fct_infreq(handedness)) %>%
+  ggplot(mapping = aes(x = handedness)) +
+  geom_bar()
+```
+##Load lubridate and hotel data
+```{r}
+library(lubridate)
+hotel <- "https://raw.githubusercontent.com/rkavalakatt/tidyverse/main/hotels.csv"
+hotels <- read_csv(hotel)
+
+```
+##Calculate and visualise the number of bookings on any given arrival date
+```{r}
+hotels %>%
+  select(starts_with("arrival_"))
+```
+##Step 1: Construct Dates
+```{r}
+library(glue)
+hotels %>%
+  mutate(
+    arrival_date = glue("{arrival_date_year} {arrival_date_month} {arrival_date_day_of_month}")
+    ) %>% 
+  relocate(arrival_date)
+```
+##Step 2: Count bookings by date
+```{r}
+hotels %>%
+  mutate(arrival_date = glue("{arrival_date_year} {arrival_date_month} {arrival_date_day_of_month}")) %>%
+  count(arrival_date)
+```
+##Step 3: Visualize bookings by date 
+```{r}
+hotels %>%
+  mutate(arrival_date = glue("{arrival_date_year} {arrival_date_month} {arrival_date_day_of_month}")) %>%
+  count(arrival_date) %>%
+  ggplot(aes(x = arrival_date, y = n, group = 1)) +
+  geom_line()
+```
+##Step 1. REVISED Construct dates "as dates"
+```{r}
+library(lubridate)
+hotels %>%
+  mutate(
+    arrival_date = ymd(glue("{arrival_date_year} {arrival_date_month} {arrival_date_day_of_month}"))
+    ) %>% 
+  relocate(arrival_date)
+```
+##Step 2. Count bookings per date
+```{r}
+hotels %>%
+  mutate(arrival_date = ymd(glue("{arrival_date_year} {arrival_date_month} {arrival_date_day_of_month}"))) %>% 
+  count(arrival_date)
+```
+##Step 3a. Visualise bookings per date
+```{r}
+hotels %>%
+  mutate(arrival_date = ymd(glue("{arrival_date_year} {arrival_date_month} {arrival_date_day_of_month}"))) %>% 
+  count(arrival_date) %>%
+  ggplot(aes(x = arrival_date, y = n, group = 1)) +
+  geom_line()
+```
+##Step 3b. Visualise using a smooth curve
+```{r}
+hotels %>%
+  mutate(arrival_date = ymd(glue("{arrival_date_year} {arrival_date_month} {arrival_date_day_of_month}"))) %>% 
+  count(arrival_date) %>%
+  ggplot(aes(x = arrival_date, y = n, group = 1)) +
+  geom_smooth()
+```
+
+
+
