@@ -1,0 +1,8 @@
+---
+title: Data Classes
+author: ''
+date: '2022-02-21'
+slug: data-classes
+categories: []
+tags: []
+---
