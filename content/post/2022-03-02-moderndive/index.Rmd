@@ -6,8 +6,7 @@ slug: moderndive
 categories: []
 tags: []
 ---
-# The Preliminaries
-## Import libraries and Data
+### The Preliminaries (importing libraries)
 ```{r}
 library(tidyverse)
 library(moderndive)
