@@ -6,7 +6,53 @@ slug: a1-modeling-for-prediction
 categories: []
 tags: []
 ---
-```{r}
+# Questions
+#### a) LOOCV is the better option over k-fold cross validation when you are trying to get the most accurate estimate of the machine learning model. The LOOCV lowers this bias by using all the data. But it will take up a lot of time and computer resources making the model. Similarly, k fold cross validation is better than single split validation when k>2. This is because with single split validation, you split the data into two groups, a model and a test group. If there is significant variation between the groups in terms of data then the single split validation will preform poorly. In Summary, in increasing accuracy it is single split, k-fold, and LOOCV, but each option takes increasingly more time and effort as well.
+#### b)Bootstrapping is advantagous because it does not rely on assuming the shape of the population. It takes samples from the data provided to make its infernce(bootstrapping model assumes this sampling with repetition is similar to sampling from the population. Bootstrapping is bad for small data sets because it cant extrapolate anything or assume the shape of the population. 
+### c) Data pulled from github below
+#### d)I tried the variables x1-x4 and ignored x5, x6 because as latitude and longitude is not useful without any context on geographic location or country. First, K values 1-10 were ran through a for look to determine the error at each K value. A graph was made for each variable containing info for polynomial degrees 1 through 10. For variable x4, the error was the least and the range of error for each of the polynomial degrees was less as well. Furthermore, some of the other plots plateaued the error near 0 as the degrees went near 6-10 which was a sign of overfitting. For x4, the error was the lowest near degree = 6. Thus, the x4 variable (number of convenience stores) with a 6th degree fitting with a K = 10 is the best model.
+#### e) I looked at the histograms to find the distribution that fit a normal distribution the most closely, which was for variable x4. The exception to this was at sample size of 10, at which point the distribution would start to skew. The results stayed pretty consistent for fifth through seventh degree polynomials, and so our results were aligned with the k fold and we achieved the equation for x4 at degree 6 fitting.
 
+# The setup
+```{r}
+library(ISLR)
+library(boot)
+library(dplyr)
+library(readr)
+real_estate <- read_csv("https://raw.githubusercontent.com/rkavalakatt/website_delete/main/content/post/2022-03-18-a1-modeling-for-prediction/Real%20estate%20valuation%20data%20set.csv")
+real_estate <- rename(real_estate, "x1" = 'X1 transaction date', "x2" = 'X2 house age', "x3" = 'X3 distance to the nearest MRT station', "x4" = 'X4 number of convenience stores', "x5" = 'X5 latitude', "x6" = 'X6 longitude', y = 'Y house price of unit area' )
+attach(real_estate)
+```
+# K fold Cross Validation code
+
+```{r}
+#var_cycle <- c(x1, x2, x3, x4)
+KValue <- 2:10
+for(K in KValue){
+degree <- 1:10  
+cv.error <- rep(0, max(degree))
+for(d in degree){
+ # for(v in var_cycle){
+  glm.fit <- glm(y~poly(x4, d), data =  real_estate)
+  cv.error[d] <- cv.glm(real_estate, glm.fit, K = K)$delta[1]
+  #}
+}
+cv.error
+plot(degree, cv.error, type = "b")
+lines(degree, cv.error, type = "b", col = "red")
+}
+```
+# BootStrap Validation
+## We are trying to estimate the accuracy of the model
+```{r}
+boot.fn <- function(data, index){
+  return(coef(glm(y~poly(x4, 6), data = data, subset = index)))
+}
+set.seed(1)
+boot.fn(real_estate, sample(414, 414, replace = T))
+boot.out <- boot(real_estate, boot.fn, 500)
+plot(boot.out)
 ```
 
+
+``

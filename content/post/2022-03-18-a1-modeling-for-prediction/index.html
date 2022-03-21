@@ -10,3 +10,81 @@ tags: []
 <script src="{{< blogdown/postref >}}index_files/header-attrs/header-attrs.js"></script>
 
 
+<div id="questions" class="section level1">
+<h1>Questions</h1>
+<div id="a-loocv-is-the-better-option-over-k-fold-cross-validation-when-you-are-trying-to-get-the-most-accurate-estimate-of-the-machine-learning-model.-the-loocv-lowers-this-bias-by-using-all-the-data.-but-it-will-take-up-a-lot-of-time-and-computer-resources-making-the-model.-similarly-k-fold-cross-validation-is-better-than-single-split-validation-when-k2.-this-is-because-with-single-split-validation-you-split-the-data-into-two-groups-a-model-and-a-test-group.-if-there-is-significant-variation-between-the-groups-in-terms-of-data-then-the-single-split-validation-will-preform-poorly.-in-summary-in-increasing-accuracy-it-is-single-split-k-fold-and-loocv-but-each-option-takes-increasingly-more-time-and-effort-as-well." class="section level4">
+<h4>a) LOOCV is the better option over k-fold cross validation when you are trying to get the most accurate estimate of the machine learning model. The LOOCV lowers this bias by using all the data. But it will take up a lot of time and computer resources making the model. Similarly, k fold cross validation is better than single split validation when k&gt;2. This is because with single split validation, you split the data into two groups, a model and a test group. If there is significant variation between the groups in terms of data then the single split validation will preform poorly. In Summary, in increasing accuracy it is single split, k-fold, and LOOCV, but each option takes increasingly more time and effort as well.</h4>
+</div>
+<div id="bbootstrapping-is-advantagous-because-it-does-not-rely-on-assuming-the-shape-of-the-population.-it-takes-samples-from-the-data-provided-to-make-its-inferncebootstrapping-model-assumes-this-sampling-with-repetition-is-similar-to-sampling-from-the-population.-bootstrapping-is-bad-for-small-data-sets-because-it-cant-extrapolate-anything-or-assume-the-shape-of-the-population." class="section level4">
+<h4>b)Bootstrapping is advantagous because it does not rely on assuming the shape of the population. It takes samples from the data provided to make its infernce(bootstrapping model assumes this sampling with repetition is similar to sampling from the population. Bootstrapping is bad for small data sets because it cant extrapolate anything or assume the shape of the population.</h4>
+</div>
+<div id="c-data-pulled-from-github-below" class="section level3">
+<h3>c) Data pulled from github below</h3>
+<div id="di-tried-the-variables-x1-x4-and-ignored-x5-x6-because-as-latitude-and-longitude-is-not-useful-without-any-context-on-geographic-location-or-country.-first-k-values-1-10-were-ran-through-a-for-look-to-determine-the-error-at-each-k-value.-a-graph-was-made-for-each-variable-containing-info-for-polynomial-degrees-1-through-10.-for-variable-x4-the-error-was-the-least-and-the-range-of-error-for-each-of-the-polynomial-degrees-was-less-as-well.-furthermore-some-of-the-other-plots-plateaued-the-error-near-0-as-the-degrees-went-near-6-10-which-was-a-sign-of-overfitting.-for-x4-the-error-was-the-lowest-near-degree-6.-thus-the-x4-variable-number-of-convenience-stores-with-a-6th-degree-fitting-with-a-k-10-is-the-best-model." class="section level4">
+<h4>d)I tried the variables x1-x4 and ignored x5, x6 because as latitude and longitude is not useful without any context on geographic location or country. First, K values 1-10 were ran through a for look to determine the error at each K value. A graph was made for each variable containing info for polynomial degrees 1 through 10. For variable x4, the error was the least and the range of error for each of the polynomial degrees was less as well. Furthermore, some of the other plots plateaued the error near 0 as the degrees went near 6-10 which was a sign of overfitting. For x4, the error was the lowest near degree = 6. Thus, the x4 variable (number of convenience stores) with a 6th degree fitting with a K = 10 is the best model.</h4>
+</div>
+<div id="e-i-looked-at-the-histograms-to-find-the-distribution-that-fit-a-normal-distribution-the-most-closely-which-was-for-variable-x4.-the-exception-to-this-was-at-sample-size-of-10-at-which-point-the-distribution-would-start-to-skew.-the-results-stayed-pretty-consistent-for-fifth-through-seventh-degree-polynomials-and-so-our-results-were-aligned-with-the-k-fold-and-we-achieved-the-equation-for-x4-at-degree-6-fitting." class="section level4">
+<h4>e) I looked at the histograms to find the distribution that fit a normal distribution the most closely, which was for variable x4. The exception to this was at sample size of 10, at which point the distribution would start to skew. The results stayed pretty consistent for fifth through seventh degree polynomials, and so our results were aligned with the k fold and we achieved the equation for x4 at degree 6 fitting.</h4>
+</div>
+</div>
+</div>
+<div id="the-setup" class="section level1">
+<h1>The setup</h1>
+<pre class="r"><code>library(ISLR)</code></pre>
+<pre><code>## Warning: package &#39;ISLR&#39; was built under R version 4.1.3</code></pre>
+<pre class="r"><code>library(boot)
+library(dplyr)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;dplyr&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     filter, lag</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     intersect, setdiff, setequal, union</code></pre>
+<pre class="r"><code>library(readr)
+real_estate &lt;- read_csv(&quot;https://raw.githubusercontent.com/rkavalakatt/website_delete/main/content/post/2022-03-18-a1-modeling-for-prediction/Real%20estate%20valuation%20data%20set.csv&quot;)</code></pre>
+<pre><code>## Rows: 414 Columns: 8</code></pre>
+<pre><code>## -- Column specification --------------------------------------------------------
+## Delimiter: &quot;,&quot;
+## dbl (8): No, X1 transaction date, X2 house age, X3 distance to the nearest M...
+## 
+## i Use `spec()` to retrieve the full column specification for this data.
+## i Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>real_estate &lt;- rename(real_estate, &quot;x1&quot; = &#39;X1 transaction date&#39;, &quot;x2&quot; = &#39;X2 house age&#39;, &quot;x3&quot; = &#39;X3 distance to the nearest MRT station&#39;, &quot;x4&quot; = &#39;X4 number of convenience stores&#39;, &quot;x5&quot; = &#39;X5 latitude&#39;, &quot;x6&quot; = &#39;X6 longitude&#39;, y = &#39;Y house price of unit area&#39; )
+attach(real_estate)</code></pre>
+</div>
+<div id="k-fold-cross-validation-code" class="section level1">
+<h1>K fold Cross Validation code</h1>
+<pre class="r"><code>#var_cycle &lt;- c(x1, x2, x3, x4)
+KValue &lt;- 2:10
+for(K in KValue){
+degree &lt;- 1:10  
+cv.error &lt;- rep(0, max(degree))
+for(d in degree){
+ # for(v in var_cycle){
+  glm.fit &lt;- glm(y~poly(x4, d), data =  real_estate)
+  cv.error[d] &lt;- cv.glm(real_estate, glm.fit, K = K)$delta[1]
+  #}
+}
+cv.error
+plot(degree, cv.error, type = &quot;b&quot;)
+lines(degree, cv.error, type = &quot;b&quot;, col = &quot;red&quot;)
+}</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-1.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-2.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-3.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-4.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-5.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-6.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-7.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-8.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-9.png" width="672" />
+# BootStrap Validation
+## We are trying to estimate the accuracy of the model</p>
+<pre class="r"><code>boot.fn &lt;- function(data, index){
+  return(coef(glm(y~poly(x4, 6), data = data, subset = index)))
+}
+set.seed(1)
+boot.fn(real_estate, sample(414, 414, replace = T))</code></pre>
+<pre><code>##  (Intercept) poly(x4, 6)1 poly(x4, 6)2 poly(x4, 6)3 poly(x4, 6)4 poly(x4, 6)5 
+##    39.837737   134.261694   -14.340950    -7.956517   -15.581235    36.964655 
+## poly(x4, 6)6 
+##   -60.333891</code></pre>
+<pre class="r"><code>boot.out &lt;- boot(real_estate, boot.fn, 500)
+plot(boot.out)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p>``</p>
+</div>
