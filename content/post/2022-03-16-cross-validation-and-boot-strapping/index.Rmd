@@ -6,3 +6,28 @@ slug: cross-validation-and-boot-strapping
 categories: []
 tags: []
 ---
+```{r}
+library(ISLR)
+library(boot)
+```
+###Set Seed for training
+```{r}
+set.seed(1)
+head(Auto)
+dim(Auto)
+###Set sample to train 50% from Auto
+train <- sample(392, 196)
+```
+###Use Auto dataset
+```{r}
+attach(Auto)
+lm.fit <- lm(mpg~horsepower, data = Auto, subset = train)
+lm.fit
+```
+```{r}
+mean((mpg - predict(lm.fit,Auto))[-train]^2)
+```
+```{r}
+plot(mpg, horsepower) 
+```
+

@@ -1,0 +1,137 @@
+---
+title: A1 Exercise
+author: ''
+date: '2022-03-21'
+slug: a1-exercise
+categories: []
+tags: []
+---
+
+library(boot)
+df <- read.csv(file = 'https://raw.githubusercontent.com/ellaprotz/webstie_ella/master/Real%20estate%20valuation%20data%20set.csv')
+df
+```
+
+## Cross Validation
+```{r}
+set.seed(1)
+head(df)
+dim(df)
+train <- sample(414, 207)
+head(train)
+```
+
+```{r}
+## Make the variables in Auto data set as locally accessible objects
+attach(df)
+lm.fit <- lm(Y.house.price.of.unit.area~X2.house.age, data = df, subset = train)
+lm.fit
+```
+
+```{r}
+mean((Y.house.price.of.unit.area - predict(lm.fit,df))[-train]^2)
+```
+
+```{r}
+plot(Y.house.price.of.unit.area~X2.house.age)
+```
+```{r}
+## Fit a quadratic function
+lm.fit.poly <- lm(Y.house.price.of.unit.area~ poly(X2.house.age,2), data = df, subset = train)
+lm.fit.poly
+```
+```{r}
+## As we increase the degree of the polynomial to 2, the error decreases
+mean((Y.house.price.of.unit.area - predict(lm.fit.poly,df))[-train]^2)
+```
+
+## LOOCV: Leave One Out and Cross Validation
+```{r}
+n = 2
+set.seed(n)
+train <- sample(414, 207)
+attach(df)
+lm.fit <- lm(Y.house.price.of.unit.area~X2.house.age, data = df, subset = train)
+lm.fit.poly <- lm(Y.house.price.of.unit.area~ poly(X2.house.age,2), data = df, subset = train)
+mean((Y.house.price.of.unit.area - predict(lm.fit,df))[-train]^2)
+mean((Y.house.price.of.unit.area - predict(lm.fit.poly,df))[-train]^2)
+```
+
+
+```{r}
+glm.fit <- glm(Y.house.price.of.unit.area~X2.house.age, data = df)
+coef(glm.fit)
+lm.fit <- lm(Y.house.price.of.unit.area~X2.house.age, data = df)
+coef(lm.fit)
+```
+```{r}
+cv.err <- cv.glm(df, glm.fit)
+cv.err$delta
+```
+```{r}
+cv.error <- rep(0,5)
+degree <- 1:5
+for (d in degree){
+  glm.fit <- glm(Y.house.price.of.unit.area~poly(X2.house.age,d), data = df)
+  cv.error[d] <- cv.glm(df, glm.fit)$delta[1]
+}
+cv.error
+```
+```{r}
+plot(degree, cv.error, type = "b")
+```
+
+## K For Cross Validation
+```{r}
+K = 10
+cv.error.10 <- rep(0,5)
+degree <- 1:5
+for (d in degree){
+  glm.fit <- glm(Y.house.price.of.unit.area~poly(X2.house.age,d), data = df)
+  cv.error.10[d] <- cv.glm(df, glm.fit, K = K)$delta[1]
+}
+cv.error.10
+```
+```{r}
+plot(degree, cv.error, type = "b")
+lines(degree, cv.error.10, type = "b", col = "red")
+```
+## Bootstrap Validation
+```{r}
+## Estimation of Accuracy of a Linear Model
+boot.fn <- function(data, index) {
+  return(coef(lm(Y.house.price.of.unit.area~X2.house.age, data = data, subset = index)))
+}
+```
+
+```{r}
+boot.fn(df, 1:414)
+```
+
+```{r}
+boot(df, boot.fn, 100)
+```
+
+
+```{r}
+boot.out <- boot(df, boot.fn, 100)
+plot(boot.out)
+```
+```{r}
+boot(df, boot.fn, 1000)
+```
+
+```{r}
+boot.out <- boot(df, boot.fn, 1000)
+plot(boot.out)
+```
+
+```{r}
+boot(df, boot.fn, 10000)
+```
+
+```{r}
+boot.out <- boot(df, boot.fn, 10000)
+plot(boot.out)
+```
+

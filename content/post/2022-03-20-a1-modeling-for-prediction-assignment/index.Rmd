@@ -22,6 +22,7 @@ library(readr)
 real_estate <- read_csv("https://raw.githubusercontent.com/rkavalakatt/website_delete/main/content/post/2022-03-18-a1-modeling-for-prediction/Real%20estate%20valuation%20data%20set.csv")
 real_estate <- rename(real_estate, "x1" = 'X1 transaction date', "x2" = 'X2 house age', "x3" = 'X3 distance to the nearest MRT station', "x4" = 'X4 number of convenience stores', "x5" = 'X5 latitude', "x6" = 'X6 longitude', y = 'Y house price of unit area' )
 attach(real_estate)
+head()
 ```
 # K fold Cross Validation code
 

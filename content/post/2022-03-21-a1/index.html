@@ -1,0 +1,231 @@
+---
+title: A1
+author: ''
+date: '2022-03-21'
+slug: a1
+categories: []
+tags: []
+---
+
+<script src="{{< blogdown/postref >}}index_files/header-attrs/header-attrs.js"></script>
+
+
+<p>###Questions
+## a) The advantages of k-fold cross validation over the single split validation set approach is that single split validation splits the data into two groups, so if there is a lot of variation between the two groups that will carry into the validation and increase potential estimation error. Thus, k fold cross validation is better, also because single split validation only takes a part of the data to fit the model. Compared to LOOCV, however, the k fold cross validation does not perform as well. This is because LOOCV provides the most accurate estimate by using all the data. As such, LOOCV has less bias, but is subject to greater skew from outliers.</p>
+<div id="b-bootstrapping-is-a-simple-and-direct-way-to-estimate-statistics-by-sampling-the-dataset-with-replacement-and-works-with-small-or-large-data-sets.-bootstrapping-is-disadvantageous-however-because-it-cannot-make-any-assumptions-about-the-shape-of-the-data-and-can-take-a-lot-of-time-and-effort-to-perform." class="section level2">
+<h2>b) Bootstrapping is a simple and direct way to estimate statistics by sampling the dataset with replacement, and works with small or large data sets. Bootstrapping is disadvantageous, however, because it cannot make any assumptions about the shape of the data, and can take a lot of time and effort to perform.</h2>
+</div>
+<div id="c-data-pulled-from-github-below" class="section level2">
+<h2>c) Data pulled from Github below</h2>
+</div>
+<div id="d-i-used-variables-x3-distance-to-the-nearest-mrt-station-and-x4-number-of-convenience-stores.-i-did-not-use-variables-like-latitute-or-longitude-because-they-are-not-very-useful-without-additional-contextual-information-and-some-of-the-other-variables-such-as-x4-did-not-have-a-very-high-correlation-with-the-house-price.-i-looked-at-different-k-values-as-well-as-different-polynomial-values-for-two-variables-as-well-as-different-number-of-samples-for-hte-bootstraping-validation." class="section level2">
+<h2>d) I used variables x3 (distance to the nearest MRT station) and x4 (number of convenience stores). I did not use variables like latitute or longitude, because they are not very useful without additional contextual information, and some of the other variables such as x4 did not have a very high correlation with the house price. I looked at different K values as well as different polynomial values for two variables, as well as different number of samples for hte bootstraping validation.</h2>
+<pre class="r"><code>library(ISLR)</code></pre>
+<pre><code>## Warning: package &#39;ISLR&#39; was built under R version 4.1.3</code></pre>
+<pre class="r"><code>library(boot)</code></pre>
+</div>
+<div id="cross-validation" class="section level1">
+<h1>Cross Validation</h1>
+<div id="set-the-seed" class="section level2">
+<h2>set the seed</h2>
+<pre class="r"><code>set.seed(1)
+real_estate_data &lt;- read.csv(file = &quot;https://raw.githubusercontent.com/rkavalakatt/website_delete/main/content/post/2022-03-18-a1-modeling-for-prediction/Real%20estate%20valuation%20data%20set.csv&quot;)
+head(real_estate_data)</code></pre>
+<pre><code>##   No X1.transaction.date X2.house.age X3.distance.to.the.nearest.MRT.station
+## 1  1            2012.917         32.0                               84.87882
+## 2  2            2012.917         19.5                              306.59470
+## 3  3            2013.583         13.3                              561.98450
+## 4  4            2013.500         13.3                              561.98450
+## 5  5            2012.833          5.0                              390.56840
+## 6  6            2012.667          7.1                             2175.03000
+##   X4.number.of.convenience.stores X5.latitude X6.longitude
+## 1                              10    24.98298     121.5402
+## 2                               9    24.98034     121.5395
+## 3                               5    24.98746     121.5439
+## 4                               5    24.98746     121.5439
+## 5                               5    24.97937     121.5425
+## 6                               3    24.96305     121.5125
+##   Y.house.price.of.unit.area
+## 1                       37.9
+## 2                       42.2
+## 3                       47.3
+## 4                       54.8
+## 5                       43.1
+## 6                       32.1</code></pre>
+<pre class="r"><code>dim(real_estate_data)</code></pre>
+<pre><code>## [1] 414   8</code></pre>
+<pre class="r"><code>attach(real_estate_data)</code></pre>
+<div id="sample-50-records" class="section level3">
+<h3>Sample 50% records</h3>
+<pre class="r"><code>train &lt;- sample(414, 207)
+head(train)</code></pre>
+<pre><code>## [1] 324 167 129 299 270 187</code></pre>
+<pre class="r"><code>lm.fit.3 &lt;- lm(Y.house.price.of.unit.area~X3.distance.to.the.nearest.MRT.station, data = real_estate_data, subset = train)
+lm.fit.3</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Y.house.price.of.unit.area ~ X3.distance.to.the.nearest.MRT.station, 
+##     data = real_estate_data, subset = train)
+## 
+## Coefficients:
+##                            (Intercept)  X3.distance.to.the.nearest.MRT.station  
+##                               46.55415                                -0.00731</code></pre>
+</div>
+<div id="calculate-error-of-the-residual" class="section level3">
+<h3>Calculate error of the residual</h3>
+<pre class="r"><code>mean((Y.house.price.of.unit.area - predict(lm.fit.3,real_estate_data))[-train]^2)</code></pre>
+<pre><code>## [1] 80.61561</code></pre>
+<p>###Plot</p>
+<pre class="r"><code>plot(Y.house.price.of.unit.area~X3.distance.to.the.nearest.MRT.station) </code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-6-1.png" width="672" />
+### Quadratic function</p>
+<pre class="r"><code>lm.fit.poly.3 &lt;- lm(Y.house.price.of.unit.area~ poly(X3.distance.to.the.nearest.MRT.station,2), data = real_estate_data, subset = train)
+lm.fit.poly.3</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Y.house.price.of.unit.area ~ poly(X3.distance.to.the.nearest.MRT.station, 
+##     2), data = real_estate_data, subset = train)
+## 
+## Coefficients:
+##                                      (Intercept)  
+##                                            38.60  
+## poly(X3.distance.to.the.nearest.MRT.station, 2)1  
+##                                          -190.30  
+## poly(X3.distance.to.the.nearest.MRT.station, 2)2  
+##                                            68.43</code></pre>
+</div>
+<div id="find-the-error-of-the-quadratic-functionthe-error-decreases" class="section level3">
+<h3>Find the error of the quadratic function(the error decreases)</h3>
+<pre class="r"><code>mean((Y.house.price.of.unit.area - predict(lm.fit.poly.3,real_estate_data))[-train]^2)</code></pre>
+<pre><code>## [1] 65.69877</code></pre>
+</div>
+</div>
+<div id="using-variable-4" class="section level2">
+<h2>Using Variable 4</h2>
+<pre class="r"><code>lm.fit.4 &lt;- lm(Y.house.price.of.unit.area~X4.number.of.convenience.stores, data = real_estate_data, subset = train)
+lm.fit.4</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Y.house.price.of.unit.area ~ X4.number.of.convenience.stores, 
+##     data = real_estate_data, subset = train)
+## 
+## Coefficients:
+##                     (Intercept)  X4.number.of.convenience.stores  
+##                          28.487                            2.636</code></pre>
+<div id="calculate-error-of-the-residual-1" class="section level3">
+<h3>Calculate error of the residual</h3>
+<pre class="r"><code>mean((Y.house.price.of.unit.area - predict(lm.fit.4,real_estate_data))[-train]^2)</code></pre>
+<pre><code>## [1] 98.60626</code></pre>
+<p>###Plot</p>
+<pre class="r"><code>plot(Y.house.price.of.unit.area~X4.number.of.convenience.stores) </code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-11-1.png" width="672" />
+### Quadratic function</p>
+<pre class="r"><code>lm.fit.poly.4 &lt;- lm(Y.house.price.of.unit.area~ poly(X4.number.of.convenience.stores,2), data = real_estate_data, subset = train)
+lm.fit.poly.4</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Y.house.price.of.unit.area ~ poly(X4.number.of.convenience.stores, 
+##     2), data = real_estate_data, subset = train)
+## 
+## Coefficients:
+##                               (Intercept)  
+##                                     39.31  
+## poly(X4.number.of.convenience.stores, 2)1  
+##                                    156.25  
+## poly(X4.number.of.convenience.stores, 2)2  
+##                                    -17.87</code></pre>
+</div>
+<div id="find-the-error-of-the-quadratic-functionthe-error-decreases-1" class="section level3">
+<h3>Find the error of the quadratic function(the error decreases)</h3>
+<pre class="r"><code>mean((Y.house.price.of.unit.area - predict(lm.fit.poly.4,real_estate_data))[-train]^2)</code></pre>
+<pre><code>## [1] 98.06089</code></pre>
+<pre class="r"><code>glm.fit &lt;- glm(Y.house.price.of.unit.area~X3.distance.to.the.nearest.MRT.station, data = real_estate_data)
+coef(glm.fit)</code></pre>
+<pre><code>##                            (Intercept) X3.distance.to.the.nearest.MRT.station 
+##                           45.851427058                           -0.007262052</code></pre>
+<pre class="r"><code>lm.fit &lt;- lm(Y.house.price.of.unit.area~X3.distance.to.the.nearest.MRT.station, data = real_estate_data)
+coef(lm.fit)</code></pre>
+<pre><code>##                            (Intercept) X3.distance.to.the.nearest.MRT.station 
+##                           45.851427058                           -0.007262052</code></pre>
+<pre class="r"><code>cv.err &lt;- cv.glm(real_estate_data, glm.fit)
+cv.err$delta</code></pre>
+<pre><code>## [1] 101.8171 101.8160</code></pre>
+<pre class="r"><code>cv.error &lt;- rep(0,5)
+degree &lt;- 1:5
+for (d in degree){
+  glm.fit &lt;- glm(Y.house.price.of.unit.area~poly(X3.distance.to.the.nearest.MRT.station,d), data = real_estate_data)
+  cv.error[d] &lt;- cv.glm(real_estate_data, glm.fit)$delta[1]
+}
+cv.error</code></pre>
+<pre><code>## [1] 101.81709  88.70438  83.09502  81.12731  81.60174</code></pre>
+<pre class="r"><code>plot(degree, cv.error, type = &quot;b&quot;)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
+</div>
+<div id="k-for-cross-validation" class="section level3">
+<h3>K For Cross Validation</h3>
+<pre class="r"><code>K = 2
+cv.error.7 &lt;- rep(0,5)
+degree &lt;- 1:5
+for (d in degree){
+  glm.fit &lt;- glm(Y.house.price.of.unit.area~poly(X3.distance.to.the.nearest.MRT.station,d), data = real_estate_data)
+  cv.error.7[d] &lt;- cv.glm(real_estate_data, glm.fit, K = K)$delta[1]
+}
+cv.error.7</code></pre>
+<pre><code>## [1] 101.61955  91.25929  83.88455  83.20432  82.11820</code></pre>
+<pre class="r"><code>plot(degree, cv.error, type = &quot;b&quot;)
+lines(degree, cv.error.7, type = &quot;b&quot;, col = &quot;red&quot;)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-19-1.png" width="672" />
+### K For Cross Validation</p>
+<pre class="r"><code>K = 7
+cv.error.7 &lt;- rep(0,5)
+degree &lt;- 1:5
+for (d in degree){
+  glm.fit &lt;- glm(Y.house.price.of.unit.area~poly(X3.distance.to.the.nearest.MRT.station,d), data = real_estate_data)
+  cv.error.7[d] &lt;- cv.glm(real_estate_data, glm.fit, K = K)$delta[1]
+}
+cv.error.7</code></pre>
+<pre><code>## [1] 101.62925  88.24638  83.46702  82.04685  81.72055</code></pre>
+<pre class="r"><code>plot(degree, cv.error, type = &quot;b&quot;)
+lines(degree, cv.error.7, type = &quot;b&quot;, col = &quot;red&quot;)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-21-1.png" width="672" />
+## Perform Bootstrap Validation</p>
+<pre class="r"><code>boot.fn &lt;- function(data, index) {
+  return(coef(lm(Y.house.price.of.unit.area~X3.distance.to.the.nearest.MRT.station, data = data, subset = index)))
+}</code></pre>
+<p>###Sample size 2000</p>
+<pre class="r"><code>boot.fn(real_estate_data, sample(414, 414, replace = T))</code></pre>
+<pre><code>##                            (Intercept) X3.distance.to.the.nearest.MRT.station 
+##                           46.605899746                           -0.008230184</code></pre>
+<pre class="r"><code>boot.out &lt;- boot(real_estate_data, boot.fn, 2000)
+plot(boot.out)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-23-1.png" width="672" /></p>
+</div>
+<div id="sample-size-100" class="section level3">
+<h3>Sample size 100</h3>
+<pre class="r"><code>boot.fn(real_estate_data, 100)</code></pre>
+<pre><code>##                            (Intercept) X3.distance.to.the.nearest.MRT.station 
+##                                   62.2                                     NA</code></pre>
+<pre class="r"><code>boot.out &lt;- boot(real_estate_data, boot.fn, 100)
+plot(boot.out)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-24-1.png" width="672" />
+## Perform Bootstrap Validation</p>
+<pre class="r"><code>boot.fn &lt;- function(data, index) {
+  return(coef(lm(Y.house.price.of.unit.area~X4.number.of.convenience.stores, data = data, subset = index)))
+}</code></pre>
+<p>###Sample size 2000</p>
+<pre class="r"><code>boot.fn(real_estate_data, sample(414, 414, replace = T))</code></pre>
+<pre><code>##                     (Intercept) X4.number.of.convenience.stores 
+##                       27.507509                        2.664128</code></pre>
+<pre class="r"><code>boot.out &lt;- boot(real_estate_data, boot.fn, 2000)
+plot(boot.out)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-26-1.png" width="672" />
+###Sample size 500</p>
+<pre class="r"><code>boot.fn(real_estate_data, sample(414, 414, replace = T))</code></pre>
+<pre><code>##                     (Intercept) X4.number.of.convenience.stores 
+##                       26.713659                        2.700954</code></pre>
+<pre class="r"><code>boot.out &lt;- boot(real_estate_data, boot.fn, 500)
+plot(boot.out)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-27-1.png" width="672" /></p>
+</div>
+</div>
+</div>
