@@ -7,13 +7,14 @@ categories: []
 tags: []
 ---
 ###Questions
-## a) The advantages of k-fold cross validation over the single split validation set approach is that single split validation splits the data into two groups, so if there is a lot of variation between the two groups that will carry into the validation and increase potential estimation error. Thus, k fold cross validation is better, also because single split validation only takes a part of the data to fit the model. Compared to LOOCV, however, the k fold cross validation does not perform as well. This is because LOOCV provides the most accurate estimate by using all the data. As such, LOOCV has less bias, but is subject to greater skew from outliers. 
 
-## b) Bootstrapping is a simple and direct way to estimate statistics by sampling the dataset with replacement, and works with small or large data sets. Bootstrapping is disadvantageous, however, because it cannot make any assumptions about the shape of the data, and can take a lot of time and effort to perform. 
+### a) The advantages of k-fold cross validation over the single split validation set approach is that single split validation splits the data into two groups, so if there is a lot of variation between the two groups that will carry into the validation and increase potential estimation error. Thus, k fold cross validation is better, also because single split validation only takes a part of the data to fit the model. Compared to LOOCV, however, the k fold cross validation does not perform as well. This is because LOOCV provides the most accurate estimate by using all the data. As such, LOOCV has less bias, but is subject to greater skew from outliers. 
 
-## c) Data pulled from Github below
+### b) Bootstrapping is a simple and direct way to estimate statistics by sampling the dataset with replacement, and works with small or large data sets. Bootstrapping is disadvantageous, however, because it cannot make any assumptions about the shape of the data, and can take a lot of time and effort to perform. 
 
-## d) I used variables x3 (distance to the nearest MRT station) and x4 (number of convenience stores). I did not use variables like latitute or longitude, because they are not very useful without additional contextual information, and some of the other variables such as x4 did not have a very high correlation with the house price. I looked at different K values as well as different polynomial values for two variables, as well as different number of samples for hte bootstraping validation. 
+### c) Data pulled from Github below
+
+### d) I used variables x3 (distance to the nearest MRT station) and x4 (number of convenience stores). I did not use variables like latitute or longitude, because they are not very useful without additional contextual information, and some of the other variables such as x4 did not have a very high correlation with the house price. I looked at different K values as well as different polynomial values for two variables, as well as different number of samples for hte bootstraping validation. 
 
 ```{r} 
 library(ISLR)
