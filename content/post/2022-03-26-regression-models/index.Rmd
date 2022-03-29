@@ -1,5 +1,5 @@
 ---
-title: Regression Models
+title: A02 Regression Models
 author: ''
 date: '2022-03-26'
 slug: regression-models
@@ -7,18 +7,225 @@ categories: []
 tags: []
 ---
 ```{r}
+library(ISLR)
+library(tidyverse)
+library(boot)
+
+diamond_data <- read_csv("https://raw.githubusercontent.com/rkavalakatt/website_delete/main/content/post/2022-03-26-regression-models/Professor_Proposes_Data.csv")
+attach(diamond_data)
+head(diamond_data)
+```
+##
+```{r}
+###COunt of each variable
+diamond_data %>% count(Carat)
+diamond_data %>% count(Cut)
+diamond_data %>% count(Clarity)
+diamond_data %>% count(Certification)
+diamond_data %>% count(Polish)
+diamond_data %>% count(Symmetry)
+diamond_data %>% count(Price)
+diamond_data %>% count(Wholesaler)
+
+
+## Make graphs of the frequency of each of the variables
+
+###Bar chart of Carat
+diamond_data %>%
+  ggplot() +
+  geom_bar(aes(Cut, fill = Cut)) +
+  theme(
+    axis.title.x = element_blank(),
+    legend.position = "none"
+  )
+
+###Bar chart of Colour
+diamond_data %>%
+  ggplot() +
+  geom_bar(aes(Cut, fill = Cut)) +
+  theme(
+    axis.title.x = element_blank(),
+    legend.position = "none"
+  )
+
+###Bar chart of Cut
+diamond_data %>%
+  ggplot() +
+  geom_bar(aes(Cut, fill = Cut)) +
+  theme(
+    axis.title.x = element_blank(),
+    legend.position = "none"
+  )
+
+###Bar chart of Clarity
+diamond_data %>%
+  ggplot() +
+  geom_bar(aes(Clarity, fill = Clarity)) +
+  theme(
+    axis.title.x = element_blank(),
+    legend.position = "none"
+  )
+
+###Bar chart of Certification
+diamond_data %>%
+  ggplot() +
+  geom_bar(aes(Certification, fill = Certification)) +
+  theme(
+    axis.title.x = element_blank(),
+    legend.position = "none"
+  )
+
+###Bar chart of Polish
+diamond_data %>%
+  ggplot() +
+  geom_bar(aes(Cut, fill = Cut)) +
+  theme(
+    axis.title.x = element_blank(),
+    legend.position = "none"
+  )
+
 
 ```
 
 
+```{r}
+###In order to find which variables influence the 
 
 
 
+```
 
+```{r}
+# Create dichotomous variable for ideal cut or higher
+diamond_data %<>%
+  mutate(
+    avg_cut = case_when(
+      Cut %in%
+        c("F",
+          "G") ~
+          "no",
+      Cut %in%
+        c("I",
+          "V",
+          "X") ~
+          "yes",
+      Cut == "NA" ~ "NA")
+  ) %>%
+  print()
 
+### get count for avg_cut
+diamond_data %>% count(avg_cut)
 
+### Plot of Price vs Carat size, with avg_cut overlaid
+diamond_data %>%
+  filter(!is.na(avg_cut)) %>%
+  ggplot(aes(x = Carat, y = Price, fill = avg_cut, color = avg_cut)) + 
+  geom_point()
+```
 
+```{r}
+# Create dichotomous variable for ideal polish or higher
+diamond_data %<>%
+  mutate(
+    avg_polish = case_when(
+      Polish %in%
+        c("F",
+          "G") ~
+          "no",
+      Polish %in%
+        c("I",
+          "V",
+          "X") ~
+          "yes",
+      Polish == "NA" ~ "NA")
+  ) %>%
+  print()
 
+### get count for avg_cut
+diamond_data %>% count(avg_polish)
 
+### Plot of Price vs Carat size, with avg_polish overlaid overlaid
+diamond_data %>%
+  filter(!is.na(avg_polish)) %>%
+  ggplot(aes(x = Wholesaler, y = Price, fill = avg_polish, color = avg_polish)) + 
+  geom_point()
+
+## Wholesaler 1 seems to have the highest quality of polish among the three sellers.
+```
+```{r}
+# Create dichotomous variable for ideal symmetry or higher
+diamond_data %<>%
+  mutate(
+    avg_sym = case_when(
+      Symmetry %in%
+        c("F",
+          "G") ~
+          "no",
+      Symmetry %in%
+        c("I",
+          "V",
+          "X") ~
+          "yes",
+      Symmetry == "NA" ~ "NA")
+  ) %>%
+  print()
+
+### get count for avg_cut
+diamond_data %>% count(avg_sym)
+
+### Plot of Price vs Carat size, with avg_polish overlaid overlaid
+diamond_data %>%
+  filter(!is.na(avg_sym)) %>%
+  ggplot(aes(x = Carat, y = Price, fill = avg_sym, color = avg_sym)) + 
+  geom_point()
+```
+```{r}
+diamond_data
+```
+
+```{r}
+## The factors with a large influence on price seem to be Carat and Cut
+##Linear regression model using Carat and Cut
+
+cut.carat.lm.fit <- lm(Price~Cut + Carat, data = diamond_data)
+summary(cut.carat.lm.fit)
+```
+
+```{r}
+##Linear Regression Model w all variables
+
+all.lm.fit <- lm(Price~Carat + Colour + Clarity + Cut + Certification + Polish + Symmetry, data = diamond_data)
+summary(all.lm.fit)
+```
+```{r}
+##Conduct the regression model using our professor's given data
+professors_ring <- data.frame(Carat = 0.9, Colour = "J", Clarity = "SI2", Cut = "V", Certification = "GIA", Polish = "G", Symmetry = "V")
+
+predict(cut.carat.lm.fit, professors_ring)
+predict(all.lm.fit, professors_ring)
+```
+```{r}
+## Second method: Bootstrapping
+
+set.seed(1)
+
+boot.fn <- function(data, index) {
+  return(coef(lm(Price~Cut + Carat, data = diamond_data, subset = index)))
+}
+
+boot.out <- boot(diamond_data, boot.fn, 500)
+plot(boot.out)
+```
+```{r}
+
+set.seed(1)
+
+boot.fn <- function(data, index) {
+  return(coef(lm(Price~Cut + Carat, data = diamond_data, subset = index)))
+}
+
+boot.out <- boot(diamond_data, boot.fn, 500)
+plot(boot.out)
+```
 
 

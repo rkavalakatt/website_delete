@@ -1,5 +1,5 @@
 ---
-title: Regression Models
+title: A02 Regression Models
 author: ''
 date: '2022-03-26'
 slug: regression-models
@@ -10,3 +10,446 @@ tags: []
 <script src="{{< blogdown/postref >}}index_files/header-attrs/header-attrs.js"></script>
 
 
+<pre class="r"><code>library(ISLR)</code></pre>
+<pre><code>## Warning: package &#39;ISLR&#39; was built under R version 4.1.3</code></pre>
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>## -- Attaching packages --------------------------------------- tidyverse 1.3.1 --</code></pre>
+<pre><code>## v ggplot2 3.3.5     v purrr   0.3.4
+## v tibble  3.1.6     v dplyr   1.0.7
+## v tidyr   1.2.0     v stringr 1.4.0
+## v readr   2.1.2     v forcats 0.5.1</code></pre>
+<pre><code>## -- Conflicts ------------------------------------------ tidyverse_conflicts() --
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>library(boot)
+
+diamond_data &lt;- read_csv(&quot;https://raw.githubusercontent.com/rkavalakatt/website_delete/main/content/post/2022-03-26-regression-models/Professor_Proposes_Data.csv&quot;)</code></pre>
+<pre><code>## Rows: 440 Columns: 9</code></pre>
+<pre><code>## -- Column specification --------------------------------------------------------
+## Delimiter: &quot;,&quot;
+## chr (6): Colour, Clarity, Cut, Certification, Polish, Symmetry
+## dbl (3): Carat, Price, Wholesaler
+## 
+## i Use `spec()` to retrieve the full column specification for this data.
+## i Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>attach(diamond_data)
+head(diamond_data)</code></pre>
+<pre><code>## # A tibble: 6 x 9
+##   Carat Colour Clarity Cut   Certification Polish Symmetry Price Wholesaler
+##   &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt;         &lt;chr&gt;  &lt;chr&gt;    &lt;dbl&gt;      &lt;dbl&gt;
+## 1  0.92 I      SI2     G     AGS           V      V         3000          1
+## 2  0.92 I      SI2     V     AGS           G      G         3000          1
+## 3  0.82 F      SI2     I     GIA           X      X         3004          1
+## 4  0.81 G      SI1     I     GIA           X      V         3004          1
+## 5  0.9  J      VS2     V     GIA           V      V         3006          1
+## 6  0.87 F      SI2     I     AGS           G      V         3007          1</code></pre>
+<div id="section" class="section level2">
+<h2></h2>
+<pre class="r"><code>###COunt of each variable
+diamond_data %&gt;% count(Carat)</code></pre>
+<pre><code>## # A tibble: 50 x 2
+##    Carat     n
+##    &lt;dbl&gt; &lt;int&gt;
+##  1  0.09     5
+##  2  0.1     13
+##  3  0.11     5
+##  4  0.2      1
+##  5  0.21     7
+##  6  0.22     5
+##  7  0.23     7
+##  8  0.27     1
+##  9  0.28     2
+## 10  0.3    154
+## # ... with 40 more rows</code></pre>
+<pre class="r"><code>diamond_data %&gt;% count(Cut)</code></pre>
+<pre><code>## # A tibble: 5 x 2
+##   Cut       n
+##   &lt;chr&gt; &lt;int&gt;
+## 1 F        59
+## 2 G        49
+## 3 I        86
+## 4 V        97
+## 5 X       149</code></pre>
+<pre class="r"><code>diamond_data %&gt;% count(Clarity)</code></pre>
+<pre><code>## # A tibble: 9 x 2
+##   Clarity     n
+##   &lt;chr&gt;   &lt;int&gt;
+## 1 I1         82
+## 2 I2         28
+## 3 SI1       116
+## 4 SI2       110
+## 5 SI3        26
+## 6 VS1        30
+## 7 VS2        41
+## 8 VVS1        2
+## 9 VVS2        5</code></pre>
+<pre class="r"><code>diamond_data %&gt;% count(Certification)</code></pre>
+<pre><code>## # A tibble: 5 x 2
+##   Certification     n
+##   &lt;chr&gt;         &lt;int&gt;
+## 1 AGS              12
+## 2 DOW               1
+## 3 EGL             119
+## 4 GIA             265
+## 5 IGI              43</code></pre>
+<pre class="r"><code>diamond_data %&gt;% count(Polish)</code></pre>
+<pre><code>## # A tibble: 6 x 2
+##   Polish     n
+##   &lt;chr&gt;  &lt;int&gt;
+## 1 F          5
+## 2 G        165
+## 3 I          5
+## 4 v          1
+## 5 V        203
+## 6 X         61</code></pre>
+<pre class="r"><code>diamond_data %&gt;% count(Symmetry)</code></pre>
+<pre><code>## # A tibble: 5 x 2
+##   Symmetry     n
+##   &lt;chr&gt;    &lt;int&gt;
+## 1 F           21
+## 2 G          157
+## 3 I            5
+## 4 V          206
+## 5 X           51</code></pre>
+<pre class="r"><code>diamond_data %&gt;% count(Price)</code></pre>
+<pre><code>## # A tibble: 197 x 2
+##    Price     n
+##    &lt;dbl&gt; &lt;int&gt;
+##  1   160     6
+##  2   180    11
+##  3   190     5
+##  4   320     2
+##  5   330     6
+##  6   340     6
+##  7   360     5
+##  8   372     1
+##  9   404     1
+## 10   439     1
+## # ... with 187 more rows</code></pre>
+<pre class="r"><code>diamond_data %&gt;% count(Wholesaler)</code></pre>
+<pre><code>## # A tibble: 3 x 2
+##   Wholesaler     n
+##        &lt;dbl&gt; &lt;int&gt;
+## 1          1    60
+## 2          2   180
+## 3          3   200</code></pre>
+<pre class="r"><code>## Make graphs of the frequency of each of the variables
+
+###Bar chart of Carat
+diamond_data %&gt;%
+  ggplot() +
+  geom_bar(aes(Cut, fill = Cut)) +
+  theme(
+    axis.title.x = element_blank(),
+    legend.position = &quot;none&quot;
+  )</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<pre class="r"><code>###Bar chart of Colour
+diamond_data %&gt;%
+  ggplot() +
+  geom_bar(aes(Cut, fill = Cut)) +
+  theme(
+    axis.title.x = element_blank(),
+    legend.position = &quot;none&quot;
+  )</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-2.png" width="672" /></p>
+<pre class="r"><code>###Bar chart of Cut
+diamond_data %&gt;%
+  ggplot() +
+  geom_bar(aes(Cut, fill = Cut)) +
+  theme(
+    axis.title.x = element_blank(),
+    legend.position = &quot;none&quot;
+  )</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-3.png" width="672" /></p>
+<pre class="r"><code>###Bar chart of Clarity
+diamond_data %&gt;%
+  ggplot() +
+  geom_bar(aes(Clarity, fill = Clarity)) +
+  theme(
+    axis.title.x = element_blank(),
+    legend.position = &quot;none&quot;
+  )</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-4.png" width="672" /></p>
+<pre class="r"><code>###Bar chart of Certification
+diamond_data %&gt;%
+  ggplot() +
+  geom_bar(aes(Certification, fill = Certification)) +
+  theme(
+    axis.title.x = element_blank(),
+    legend.position = &quot;none&quot;
+  )</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-5.png" width="672" /></p>
+<pre class="r"><code>###Bar chart of Polish
+diamond_data %&gt;%
+  ggplot() +
+  geom_bar(aes(Cut, fill = Cut)) +
+  theme(
+    axis.title.x = element_blank(),
+    legend.position = &quot;none&quot;
+  )</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-6.png" width="672" /></p>
+<pre class="r"><code>###In order to find which variables influence the </code></pre>
+<pre class="r"><code># Create dichotomous variable for ideal cut or higher
+diamond_data %&lt;&gt;%
+  mutate(
+    avg_cut = case_when(
+      Cut %in%
+        c(&quot;F&quot;,
+          &quot;G&quot;) ~
+          &quot;no&quot;,
+      Cut %in%
+        c(&quot;I&quot;,
+          &quot;V&quot;,
+          &quot;X&quot;) ~
+          &quot;yes&quot;,
+      Cut == &quot;NA&quot; ~ &quot;NA&quot;)
+  ) %&gt;%
+  print()</code></pre>
+<pre><code>## # A tibble: 440 x 10
+##    Carat Colour Clarity Cut   Certification Polish Symmetry Price Wholesaler
+##    &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt;         &lt;chr&gt;  &lt;chr&gt;    &lt;dbl&gt;      &lt;dbl&gt;
+##  1  0.92 I      SI2     G     AGS           V      V         3000          1
+##  2  0.92 I      SI2     V     AGS           G      G         3000          1
+##  3  0.82 F      SI2     I     GIA           X      X         3004          1
+##  4  0.81 G      SI1     I     GIA           X      V         3004          1
+##  5  0.9  J      VS2     V     GIA           V      V         3006          1
+##  6  0.87 F      SI2     I     AGS           G      V         3007          1
+##  7  0.8  D      SI2     I     GIA           V      V         3008          1
+##  8  0.84 F      SI1     G     GIA           V      V         3010          1
+##  9  0.8  D      SI2     V     GIA           V      V         3012          1
+## 10  0.8  D      SI2     V     GIA           V      X         3012          1
+## # ... with 430 more rows, and 1 more variable: avg_cut &lt;chr&gt;</code></pre>
+<pre class="r"><code>### get count for avg_cut
+diamond_data %&gt;% count(avg_cut)</code></pre>
+<pre><code>## # A tibble: 2 x 2
+##   avg_cut     n
+##   &lt;chr&gt;   &lt;int&gt;
+## 1 no        108
+## 2 yes       332</code></pre>
+<pre class="r"><code>### Plot of Price vs Carat size, with avg_cut overlaid
+diamond_data %&gt;%
+  filter(!is.na(avg_cut)) %&gt;%
+  ggplot(aes(x = Carat, y = Price, fill = avg_cut, color = avg_cut)) + 
+  geom_point()</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<pre class="r"><code># Create dichotomous variable for ideal polish or higher
+diamond_data %&lt;&gt;%
+  mutate(
+    avg_polish = case_when(
+      Polish %in%
+        c(&quot;F&quot;,
+          &quot;G&quot;) ~
+          &quot;no&quot;,
+      Polish %in%
+        c(&quot;I&quot;,
+          &quot;V&quot;,
+          &quot;X&quot;) ~
+          &quot;yes&quot;,
+      Polish == &quot;NA&quot; ~ &quot;NA&quot;)
+  ) %&gt;%
+  print()</code></pre>
+<pre><code>## # A tibble: 440 x 11
+##    Carat Colour Clarity Cut   Certification Polish Symmetry Price Wholesaler
+##    &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt;         &lt;chr&gt;  &lt;chr&gt;    &lt;dbl&gt;      &lt;dbl&gt;
+##  1  0.92 I      SI2     G     AGS           V      V         3000          1
+##  2  0.92 I      SI2     V     AGS           G      G         3000          1
+##  3  0.82 F      SI2     I     GIA           X      X         3004          1
+##  4  0.81 G      SI1     I     GIA           X      V         3004          1
+##  5  0.9  J      VS2     V     GIA           V      V         3006          1
+##  6  0.87 F      SI2     I     AGS           G      V         3007          1
+##  7  0.8  D      SI2     I     GIA           V      V         3008          1
+##  8  0.84 F      SI1     G     GIA           V      V         3010          1
+##  9  0.8  D      SI2     V     GIA           V      V         3012          1
+## 10  0.8  D      SI2     V     GIA           V      X         3012          1
+## # ... with 430 more rows, and 2 more variables: avg_cut &lt;chr&gt;, avg_polish &lt;chr&gt;</code></pre>
+<pre class="r"><code>### get count for avg_cut
+diamond_data %&gt;% count(avg_polish)</code></pre>
+<pre><code>## # A tibble: 3 x 2
+##   avg_polish     n
+##   &lt;chr&gt;      &lt;int&gt;
+## 1 no           170
+## 2 yes          269
+## 3 &lt;NA&gt;           1</code></pre>
+<pre class="r"><code>### Plot of Price vs Carat size, with avg_polish overlaid overlaid
+diamond_data %&gt;%
+  filter(!is.na(avg_polish)) %&gt;%
+  ggplot(aes(x = Wholesaler, y = Price, fill = avg_polish, color = avg_polish)) + 
+  geom_point()</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<pre class="r"><code>## Wholesaler 1 seems to have the highest quality of polish among the three sellers.</code></pre>
+<pre class="r"><code># Create dichotomous variable for ideal symmetry or higher
+diamond_data %&lt;&gt;%
+  mutate(
+    avg_sym = case_when(
+      Symmetry %in%
+        c(&quot;F&quot;,
+          &quot;G&quot;) ~
+          &quot;no&quot;,
+      Symmetry %in%
+        c(&quot;I&quot;,
+          &quot;V&quot;,
+          &quot;X&quot;) ~
+          &quot;yes&quot;,
+      Symmetry == &quot;NA&quot; ~ &quot;NA&quot;)
+  ) %&gt;%
+  print()</code></pre>
+<pre><code>## # A tibble: 440 x 12
+##    Carat Colour Clarity Cut   Certification Polish Symmetry Price Wholesaler
+##    &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt;         &lt;chr&gt;  &lt;chr&gt;    &lt;dbl&gt;      &lt;dbl&gt;
+##  1  0.92 I      SI2     G     AGS           V      V         3000          1
+##  2  0.92 I      SI2     V     AGS           G      G         3000          1
+##  3  0.82 F      SI2     I     GIA           X      X         3004          1
+##  4  0.81 G      SI1     I     GIA           X      V         3004          1
+##  5  0.9  J      VS2     V     GIA           V      V         3006          1
+##  6  0.87 F      SI2     I     AGS           G      V         3007          1
+##  7  0.8  D      SI2     I     GIA           V      V         3008          1
+##  8  0.84 F      SI1     G     GIA           V      V         3010          1
+##  9  0.8  D      SI2     V     GIA           V      V         3012          1
+## 10  0.8  D      SI2     V     GIA           V      X         3012          1
+## # ... with 430 more rows, and 3 more variables: avg_cut &lt;chr&gt;,
+## #   avg_polish &lt;chr&gt;, avg_sym &lt;chr&gt;</code></pre>
+<pre class="r"><code>### get count for avg_cut
+diamond_data %&gt;% count(avg_sym)</code></pre>
+<pre><code>## # A tibble: 2 x 2
+##   avg_sym     n
+##   &lt;chr&gt;   &lt;int&gt;
+## 1 no        178
+## 2 yes       262</code></pre>
+<pre class="r"><code>### Plot of Price vs Carat size, with avg_polish overlaid overlaid
+diamond_data %&gt;%
+  filter(!is.na(avg_sym)) %&gt;%
+  ggplot(aes(x = Carat, y = Price, fill = avg_sym, color = avg_sym)) + 
+  geom_point()</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<pre class="r"><code>diamond_data</code></pre>
+<pre><code>## # A tibble: 440 x 12
+##    Carat Colour Clarity Cut   Certification Polish Symmetry Price Wholesaler
+##    &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt;         &lt;chr&gt;  &lt;chr&gt;    &lt;dbl&gt;      &lt;dbl&gt;
+##  1  0.92 I      SI2     G     AGS           V      V         3000          1
+##  2  0.92 I      SI2     V     AGS           G      G         3000          1
+##  3  0.82 F      SI2     I     GIA           X      X         3004          1
+##  4  0.81 G      SI1     I     GIA           X      V         3004          1
+##  5  0.9  J      VS2     V     GIA           V      V         3006          1
+##  6  0.87 F      SI2     I     AGS           G      V         3007          1
+##  7  0.8  D      SI2     I     GIA           V      V         3008          1
+##  8  0.84 F      SI1     G     GIA           V      V         3010          1
+##  9  0.8  D      SI2     V     GIA           V      V         3012          1
+## 10  0.8  D      SI2     V     GIA           V      X         3012          1
+## # ... with 430 more rows, and 3 more variables: avg_cut &lt;chr&gt;,
+## #   avg_polish &lt;chr&gt;, avg_sym &lt;chr&gt;</code></pre>
+<pre class="r"><code>## The factors with a large influence on price seem to be Carat and Cut
+##Linear regression model using Carat and Cut
+
+cut.carat.lm.fit &lt;- lm(Price~Cut + Carat, data = diamond_data)
+summary(cut.carat.lm.fit)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Price ~ Cut + Carat, data = diamond_data)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -1572.73  -247.88    -6.91   232.39   950.66 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  -599.30      80.71  -7.425 6.02e-13 ***
+## CutG          314.30      82.27   3.820 0.000153 ***
+## CutI          471.11      74.61   6.314 6.71e-10 ***
+## CutV          457.30      77.03   5.937 5.96e-09 ***
+## CutX          172.33      67.21   2.564 0.010682 *  
+## Carat        3032.93      59.03  51.382  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 419.4 on 434 degrees of freedom
+## Multiple R-squared:  0.8742, Adjusted R-squared:  0.8728 
+## F-statistic: 603.3 on 5 and 434 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code>##Linear Regression Model w all variables
+
+all.lm.fit &lt;- lm(Price~Carat + Colour + Clarity + Cut + Certification + Polish + Symmetry, data = diamond_data)
+summary(all.lm.fit)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Price ~ Carat + Colour + Clarity + Cut + Certification + 
+##     Polish + Symmetry, data = diamond_data)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -762.63  -82.58  -18.59  101.42  689.59 
+## 
+## Coefficients: (1 not defined because of singularities)
+##                    Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)      -1432.6219   146.6961  -9.766  &lt; 2e-16 ***
+## Carat             4205.3391    51.2981  81.978  &lt; 2e-16 ***
+## ColourE           -191.2462    53.5345  -3.572 0.000396 ***
+## ColourF           -311.1620    53.6267  -5.802 1.32e-08 ***
+## ColourG           -301.4412    54.5157  -5.529 5.76e-08 ***
+## ColourH           -430.3664    53.0617  -8.111 6.03e-15 ***
+## ColourI           -500.9400    53.0827  -9.437  &lt; 2e-16 ***
+## ColourJ           -635.8407    54.6431 -11.636  &lt; 2e-16 ***
+## ColourK           -985.9734    61.0240 -16.157  &lt; 2e-16 ***
+## ColourL          -1173.6677    76.3472 -15.373  &lt; 2e-16 ***
+## ClarityI2         -778.3139    50.8010 -15.321  &lt; 2e-16 ***
+## ClaritySI1         858.5738    43.2466  19.853  &lt; 2e-16 ***
+## ClaritySI2         731.5613    35.6145  20.541  &lt; 2e-16 ***
+## ClaritySI3         388.9407    49.2119   7.903 2.58e-14 ***
+## ClarityVS1        1025.1681    59.0373  17.365  &lt; 2e-16 ***
+## ClarityVS2         915.4216    53.2913  17.178  &lt; 2e-16 ***
+## ClarityVVS1       1342.8683   154.7169   8.680  &lt; 2e-16 ***
+## ClarityVVS2        918.2219   101.0745   9.085  &lt; 2e-16 ***
+## CutG                56.4835    41.8846   1.349 0.178233    
+## CutI                95.4908    40.9225   2.333 0.020112 *  
+## CutV                84.1675    41.5654   2.025 0.043527 *  
+## CutX                56.8290    35.7071   1.592 0.112269    
+## CertificationDOW  -500.9363   223.5204  -2.241 0.025558 *  
+## CertificationEGL  -418.0748    81.9208  -5.103 5.13e-07 ***
+## CertificationGIA   -64.8962    80.6771  -0.804 0.421640    
+## CertificationIGI     0.2533    94.8367   0.003 0.997871    
+## PolishG            210.9384   106.7503   1.976 0.048832 *  
+## PolishI            461.4891   156.8392   2.942 0.003443 ** 
+## Polishv            265.1641   230.8040   1.149 0.251286    
+## PolishV            226.5659   110.6450   2.048 0.041234 *  
+## PolishX            236.0952   113.7270   2.076 0.038524 *  
+## SymmetryG          108.1495    57.3953   1.884 0.060239 .  
+## SymmetryI                NA         NA      NA       NA    
+## SymmetryV          119.4279    61.2390   1.950 0.051841 .  
+## SymmetryX          113.5676    68.3626   1.661 0.097435 .  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 197.2 on 406 degrees of freedom
+## Multiple R-squared:  0.974,  Adjusted R-squared:  0.9719 
+## F-statistic: 460.4 on 33 and 406 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code>##Conduct the regression model using our professor&#39;s given data
+professors_ring &lt;- data.frame(Carat = 0.9, Colour = &quot;J&quot;, Clarity = &quot;SI2&quot;, Cut = &quot;V&quot;, Certification = &quot;GIA&quot;, Polish = &quot;G&quot;, Symmetry = &quot;V&quot;)
+
+predict(cut.carat.lm.fit, professors_ring)</code></pre>
+<pre><code>##        1 
+## 2587.634</code></pre>
+<pre class="r"><code>predict(all.lm.fit, professors_ring)</code></pre>
+<pre><code>## Warning in predict.lm(all.lm.fit, professors_ring): prediction from a rank-
+## deficient fit may be misleading</code></pre>
+<pre><code>##        1 
+## 2797.542</code></pre>
+<pre class="r"><code>## Second method: Bootstrapping
+
+set.seed(1)
+
+boot.fn &lt;- function(data, index) {
+  return(coef(lm(Price~Cut + Carat, data = diamond_data, subset = index)))
+}
+
+boot.out &lt;- boot(diamond_data, boot.fn, 500)
+plot(boot.out)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<pre class="r"><code>set.seed(1)
+
+boot.fn &lt;- function(data, index) {
+  return(coef(lm(Price~Cut + Carat, data = diamond_data, subset = index)))
+}
+
+boot.out &lt;- boot(diamond_data, boot.fn, 500)
+plot(boot.out)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+</div>
