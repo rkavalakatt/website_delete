@@ -365,6 +365,7 @@ summary(cut.carat.lm.fit)</code></pre>
 ## Residual standard error: 419.4 on 434 degrees of freedom
 ## Multiple R-squared:  0.8742, Adjusted R-squared:  0.8728 
 ## F-statistic: 603.3 on 5 and 434 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>###The r squared value of this regression model is 0.8742, so this is a fairly accurate model.</p>
 <pre class="r"><code>##Linear Regression Model w all variables
 
 all.lm.fit &lt;- lm(Price~Carat + Colour + Clarity + Cut + Certification + Polish + Symmetry, data = diamond_data)
@@ -421,6 +422,7 @@ summary(all.lm.fit)</code></pre>
 ## Residual standard error: 197.2 on 406 degrees of freedom
 ## Multiple R-squared:  0.974,  Adjusted R-squared:  0.9719 
 ## F-statistic: 460.4 on 33 and 406 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>##The R squared value of this model is 0.972, so this is a very accurate linear regression model.</p>
 <pre class="r"><code>##Conduct the regression model using our professor&#39;s given data
 professors_ring &lt;- data.frame(Carat = 0.9, Colour = &quot;J&quot;, Clarity = &quot;SI2&quot;, Cut = &quot;V&quot;, Certification = &quot;GIA&quot;, Polish = &quot;G&quot;, Symmetry = &quot;V&quot;)
 

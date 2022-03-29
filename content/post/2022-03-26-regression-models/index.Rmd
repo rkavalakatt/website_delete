@@ -190,13 +190,14 @@ diamond_data
 cut.carat.lm.fit <- lm(Price~Cut + Carat, data = diamond_data)
 summary(cut.carat.lm.fit)
 ```
-
+###The r squared value of this regression model is 0.8742, so this is a fairly accurate model.
 ```{r}
 ##Linear Regression Model w all variables
 
 all.lm.fit <- lm(Price~Carat + Colour + Clarity + Cut + Certification + Polish + Symmetry, data = diamond_data)
 summary(all.lm.fit)
 ```
+##The R squared value of this model is 0.972, so this is a very accurate linear regression model.
 ```{r}
 ##Conduct the regression model using our professor's given data
 professors_ring <- data.frame(Carat = 0.9, Colour = "J", Clarity = "SI2", Cut = "V", Certification = "GIA", Polish = "G", Symmetry = "V")
