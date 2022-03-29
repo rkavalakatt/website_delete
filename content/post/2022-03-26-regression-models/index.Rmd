@@ -15,7 +15,7 @@ diamond_data <- read_csv("https://raw.githubusercontent.com/rkavalakatt/website_
 attach(diamond_data)
 head(diamond_data)
 ```
-##
+
 ```{r}
 ###COunt of each variable
 diamond_data %>% count(Carat)
@@ -178,9 +178,6 @@ diamond_data %>%
   filter(!is.na(avg_sym)) %>%
   ggplot(aes(x = Carat, y = Price, fill = avg_sym, color = avg_sym)) + 
   geom_point()
-```
-```{r}
-diamond_data
 ```
 
 ```{r}
