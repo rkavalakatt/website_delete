@@ -14,12 +14,73 @@ library(tidyverse)
 library(randomForest)
 
 ```
+###Import the data
 ```{r}
+train <- read.csv('https://raw.githubusercontent.com/rkavalakatt/website_delete/main/content/post/2022-04-02-a03-classification-models/train.csv')
+test <- read.csv('https://raw.githubusercontent.com/rkavalakatt/website_delete/main/content/post/2022-04-02-a03-classification-models/test.csv')
+
+head(train)
+head(test)
+
+attach(train)
+
+```
+###Find the number of NAs in each column
+```{r}
+colSums(is.na(train))
+
+colSums(train=='')
+```
+### The Age column and the Cabin column has the greatest number of missing values
+### I would expect class to have a large impact on survivability
+```{r}
+#Plot class vs survival
+ggplot(train[1:891,], aes(x = Pclass, fill = factor(Survived))) +
+  geom_bar(stat='count') +
+  labs(x = 'Class')
+```
+###As the class went down, the fraction of people that survived went down
+### I would expect the number of siblings to have a large impact on survivability
+```{r}
+#Plot number of siblings vs survival
+ggplot(train[1:891,], aes(x = SibSp, fill = factor(Survived))) +
+  geom_bar(stat='count') +
+  labs(x = 'Siblings')
+```
+### As the number of siblings went up, the fraction of people that survived went down
+
+```{r}
+### Remove Cabin and Age because it has many missing values
+titanic_data = subset(train, select =-c(Cabin, Age))
+
+head(titanic_data)
 
 ```
 
+###Run the linear regression model with all the variables
+```{r}
+model <- glm(formula = Survived~Pclass+Sex+SibSp+Parch+Fare+Embarked, data = train, family = 'binomial')
+summary(model)
 
+```
 
+### Run an Anova Test in order to determine the relative importance of each variable to the model. From the test, we can identify which variables are the most significant when predicting survivability.
+```{r}
+anova(model, test="Chisq")
+```
+### From the results of the Anova Test, we can see that Class, Sex, and Number of Siblings are the most significant variables when it comes to predicting the survivability of passengers.The Pr(>|z|) column represents the p-value associated with each of the predictor variables. Because the p-values for Class, Sex, and Number of Siblings is less than 0.05, this indicates that these predictor variables have a statistically significant relationship with the response variable (Survivability) in our model. Thus these are the variables we will include in our linear regression model.
+
+```{r}
+titanic_model <- glm(formula = Survived~Pclass+Sex+SibSp, data = train, family = 'binomial')
+summary(titanic_model)
+```
+
+```{r}
+titanic_results <- predict(titanic_model, newdata=test, type = "response")
+
+results <- data.frame(test$PassengerId, Survived = titanic_results)
+
+```
 
 
 

@@ -41,3 +41,189 @@ library(dplyr)</code></pre>
 <pre><code>## The following object is masked from &#39;package:ggplot2&#39;:
 ## 
 ##     margin</code></pre>
+<p>###Import the data</p>
+<pre class="r"><code>train &lt;- read.csv(&#39;https://raw.githubusercontent.com/rkavalakatt/website_delete/main/content/post/2022-04-02-a03-classification-models/train.csv&#39;)
+test &lt;- read.csv(&#39;https://raw.githubusercontent.com/rkavalakatt/website_delete/main/content/post/2022-04-02-a03-classification-models/test.csv&#39;)
+
+head(train)</code></pre>
+<pre><code>##   PassengerId Survived Pclass
+## 1           1        0      3
+## 2           2        1      1
+## 3           3        1      3
+## 4           4        1      1
+## 5           5        0      3
+## 6           6        0      3
+##                                                  Name    Sex Age SibSp Parch
+## 1                             Braund, Mr. Owen Harris   male  22     1     0
+## 2 Cumings, Mrs. John Bradley (Florence Briggs Thayer) female  38     1     0
+## 3                              Heikkinen, Miss. Laina female  26     0     0
+## 4        Futrelle, Mrs. Jacques Heath (Lily May Peel) female  35     1     0
+## 5                            Allen, Mr. William Henry   male  35     0     0
+## 6                                    Moran, Mr. James   male  NA     0     0
+##             Ticket    Fare Cabin Embarked
+## 1        A/5 21171  7.2500              S
+## 2         PC 17599 71.2833   C85        C
+## 3 STON/O2. 3101282  7.9250              S
+## 4           113803 53.1000  C123        S
+## 5           373450  8.0500              S
+## 6           330877  8.4583              Q</code></pre>
+<pre class="r"><code>head(test)</code></pre>
+<pre><code>##   PassengerId Pclass                                         Name    Sex  Age
+## 1         892      3                             Kelly, Mr. James   male 34.5
+## 2         893      3             Wilkes, Mrs. James (Ellen Needs) female 47.0
+## 3         894      2                    Myles, Mr. Thomas Francis   male 62.0
+## 4         895      3                             Wirz, Mr. Albert   male 27.0
+## 5         896      3 Hirvonen, Mrs. Alexander (Helga E Lindqvist) female 22.0
+## 6         897      3                   Svensson, Mr. Johan Cervin   male 14.0
+##   SibSp Parch  Ticket    Fare Cabin Embarked
+## 1     0     0  330911  7.8292              Q
+## 2     1     0  363272  7.0000              S
+## 3     0     0  240276  9.6875              Q
+## 4     0     0  315154  8.6625              S
+## 5     1     1 3101298 12.2875              S
+## 6     0     0    7538  9.2250              S</code></pre>
+<pre class="r"><code>attach(train)</code></pre>
+<p>###Find the number of NAs in each column</p>
+<pre class="r"><code>colSums(is.na(train))</code></pre>
+<pre><code>## PassengerId    Survived      Pclass        Name         Sex         Age 
+##           0           0           0           0           0         177 
+##       SibSp       Parch      Ticket        Fare       Cabin    Embarked 
+##           0           0           0           0           0           0</code></pre>
+<pre class="r"><code>colSums(train==&#39;&#39;)</code></pre>
+<pre><code>## PassengerId    Survived      Pclass        Name         Sex         Age 
+##           0           0           0           0           0          NA 
+##       SibSp       Parch      Ticket        Fare       Cabin    Embarked 
+##           0           0           0           0         687           2</code></pre>
+<div id="the-age-column-and-the-cabin-column-has-the-greatest-number-of-missing-values" class="section level3">
+<h3>The Age column and the Cabin column has the greatest number of missing values</h3>
+</div>
+<div id="i-would-expect-class-to-have-a-large-impact-on-survivability" class="section level3">
+<h3>I would expect class to have a large impact on survivability</h3>
+<pre class="r"><code>#Plot class vs survival
+ggplot(train[1:891,], aes(x = Pclass, fill = factor(Survived))) +
+  geom_bar(stat=&#39;count&#39;) +
+  labs(x = &#39;Class&#39;)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-4-1.png" width="672" />
+###As the class went down, the fraction of people that survived went down
+### I would expect the number of siblings to have a large impact on survivability</p>
+<pre class="r"><code>#Plot number of siblings vs survival
+ggplot(train[1:891,], aes(x = SibSp, fill = factor(Survived))) +
+  geom_bar(stat=&#39;count&#39;) +
+  labs(x = &#39;Siblings&#39;)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-5-1.png" width="672" />
+### As the number of siblings went up, the fraction of people that survived went down</p>
+<pre class="r"><code>### Remove Cabin and Age because it has many missing values
+titanic_data = subset(train, select =-c(Cabin, Age))
+
+head(titanic_data)</code></pre>
+<pre><code>##   PassengerId Survived Pclass
+## 1           1        0      3
+## 2           2        1      1
+## 3           3        1      3
+## 4           4        1      1
+## 5           5        0      3
+## 6           6        0      3
+##                                                  Name    Sex SibSp Parch
+## 1                             Braund, Mr. Owen Harris   male     1     0
+## 2 Cumings, Mrs. John Bradley (Florence Briggs Thayer) female     1     0
+## 3                              Heikkinen, Miss. Laina female     0     0
+## 4        Futrelle, Mrs. Jacques Heath (Lily May Peel) female     1     0
+## 5                            Allen, Mr. William Henry   male     0     0
+## 6                                    Moran, Mr. James   male     0     0
+##             Ticket    Fare Embarked
+## 1        A/5 21171  7.2500        S
+## 2         PC 17599 71.2833        C
+## 3 STON/O2. 3101282  7.9250        S
+## 4           113803 53.1000        S
+## 5           373450  8.0500        S
+## 6           330877  8.4583        Q</code></pre>
+<p>###Run the linear regression model with all the variables</p>
+<pre class="r"><code>model &lt;- glm(formula = Survived~Pclass+Sex+SibSp+Parch+Fare+Embarked, data = train, family = &#39;binomial&#39;)
+summary(model)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = Survived ~ Pclass + Sex + SibSp + Parch + Fare + 
+##     Embarked, family = &quot;binomial&quot;, data = train)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -2.3636  -0.6727  -0.4596   0.6698   2.5523  
+## 
+## Coefficients:
+##               Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  15.208813 624.193890   0.024   0.9806    
+## Pclass       -0.839111   0.130378  -6.436 1.23e-10 ***
+## Sexmale      -2.729239   0.197943 -13.788  &lt; 2e-16 ***
+## SibSp        -0.233804   0.101116  -2.312   0.0208 *  
+## Parch        -0.072900   0.114347  -0.638   0.5238    
+## Fare          0.002455   0.002369   1.036   0.3002    
+## EmbarkedC   -11.710160 624.193891  -0.019   0.9850    
+## EmbarkedQ   -11.914170 624.193942  -0.019   0.9848    
+## EmbarkedS   -12.176063 624.193877  -0.020   0.9844    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 1186.66  on 890  degrees of freedom
+## Residual deviance:  812.05  on 882  degrees of freedom
+## AIC: 830.05
+## 
+## Number of Fisher Scoring iterations: 13</code></pre>
+</div>
+<div id="run-an-anova-test-in-order-to-determine-the-relative-importance-of-each-variable-to-the-model.-from-the-test-we-can-identify-which-variables-are-the-most-significant-when-predicting-survivability." class="section level3">
+<h3>Run an Anova Test in order to determine the relative importance of each variable to the model. From the test, we can identify which variables are the most significant when predicting survivability.</h3>
+<pre class="r"><code>anova(model, test=&quot;Chisq&quot;)</code></pre>
+<pre><code>## Analysis of Deviance Table
+## 
+## Model: binomial, link: logit
+## 
+## Response: Survived
+## 
+## Terms added sequentially (first to last)
+## 
+## 
+##          Df Deviance Resid. Df Resid. Dev  Pr(&gt;Chi)    
+## NULL                       890    1186.66              
+## Pclass    1  102.254       889    1084.40 &lt; 2.2e-16 ***
+## Sex       1  257.206       888     827.20 &lt; 2.2e-16 ***
+## SibSp     1    7.877       887     819.32  0.005005 ** 
+## Parch     1    0.207       886     819.11  0.649181    
+## Fare      1    2.361       885     816.75  0.124394    
+## Embarked  3    4.698       882     812.05  0.195261    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+</div>
+<div id="from-the-results-of-the-anova-test-we-can-see-that-class-sex-and-number-of-siblings-are-the-most-significant-variables-when-it-comes-to-predicting-the-survivability-of-passengers.the-prz-column-represents-the-p-value-associated-with-each-of-the-predictor-variables.-because-the-p-values-for-class-sex-and-number-of-siblings-is-less-than-0.05-this-indicates-that-these-predictor-variables-have-a-statistically-significant-relationship-with-the-response-variable-survivability-in-our-model.-thus-these-are-the-variables-we-will-include-in-our-linear-regression-model." class="section level3">
+<h3>From the results of the Anova Test, we can see that Class, Sex, and Number of Siblings are the most significant variables when it comes to predicting the survivability of passengers.The Pr(&gt;|z|) column represents the p-value associated with each of the predictor variables. Because the p-values for Class, Sex, and Number of Siblings is less than 0.05, this indicates that these predictor variables have a statistically significant relationship with the response variable (Survivability) in our model. Thus these are the variables we will include in our linear regression model.</h3>
+<pre class="r"><code>titanic_model &lt;- glm(formula = Survived~Pclass+Sex+SibSp, data = train, family = &#39;binomial&#39;)
+summary(titanic_model)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = Survived ~ Pclass + Sex + SibSp, family = &quot;binomial&quot;, 
+##     data = train)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -2.2689  -0.6735  -0.4747   0.6189   2.5148  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  3.43357    0.30543  11.242  &lt; 2e-16 ***
+## Pclass      -0.93896    0.10647  -8.819  &lt; 2e-16 ***
+## Sexmale     -2.74314    0.19027 -14.417  &lt; 2e-16 ***
+## SibSp       -0.24812    0.09453  -2.625  0.00867 ** 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 1186.66  on 890  degrees of freedom
+## Residual deviance:  819.32  on 887  degrees of freedom
+## AIC: 827.32
+## 
+## Number of Fisher Scoring iterations: 4</code></pre>
+<pre class="r"><code>titanic_results &lt;- predict(titanic_model, newdata=test, type = &quot;response&quot;)
+
+results &lt;- data.frame(test$PassengerId, Survived = titanic_results)</code></pre>
+</div>
