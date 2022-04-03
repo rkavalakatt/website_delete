@@ -29,18 +29,6 @@ library(dplyr)</code></pre>
 <pre><code>## -- Conflicts ------------------------------------------ tidyverse_conflicts() --
 ## x dplyr::filter() masks stats::filter()
 ## x dplyr::lag()    masks stats::lag()</code></pre>
-<pre class="r"><code>library(randomForest)</code></pre>
-<pre><code>## Warning: package &#39;randomForest&#39; was built under R version 4.1.3</code></pre>
-<pre><code>## randomForest 4.7-1</code></pre>
-<pre><code>## Type rfNews() to see new features/changes/bug fixes.</code></pre>
-<pre><code>## 
-## Attaching package: &#39;randomForest&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:dplyr&#39;:
-## 
-##     combine</code></pre>
-<pre><code>## The following object is masked from &#39;package:ggplot2&#39;:
-## 
-##     margin</code></pre>
 <p>###Import the data</p>
 <pre class="r"><code>train &lt;- read.csv(&#39;https://raw.githubusercontent.com/rkavalakatt/website_delete/main/content/post/2022-04-02-a03-classification-models/train.csv&#39;)
 test &lt;- read.csv(&#39;https://raw.githubusercontent.com/rkavalakatt/website_delete/main/content/post/2022-04-02-a03-classification-models/test.csv&#39;)
