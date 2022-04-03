@@ -79,6 +79,8 @@ titanic_results <- predict(titanic_model, newdata=test, type = "response")
 
 results <- data.frame(test$PassengerId, Survived = titanic_results)
 
+results
+
 ```
 
 
