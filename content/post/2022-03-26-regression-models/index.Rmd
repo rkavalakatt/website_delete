@@ -19,22 +19,12 @@ head(diamond_data)
 ```{r}
 ###COunt of each variable
 diamond_data %>% count(Carat)
+diamond_data %>% count(Colour)
 diamond_data %>% count(Cut)
 diamond_data %>% count(Clarity)
-diamond_data %>% count(Certification)
-diamond_data %>% count(Symmetry)
-diamond_data %>% count(Price)
-diamond_data %>% count(Wholesaler)
 
 
-## Make graphs of the frequency of each of the variables
-
-###Bar chart of Carat
-diamond_data %>%
-  ggplot() +
-  geom_bar(aes(Carat, fill = Carat)) +
-   theme(legend.position = "none"
-  )
+## Make graphs of the frequency of each of the big 4 C
 
 ###Bar chart of Colour
 diamond_data %>%
@@ -57,18 +47,11 @@ diamond_data %>%
   theme(legend.position = "none"
   )
 
-###Bar chart of Certification
+###Bar chart of Carat
 diamond_data %>%
   ggplot() +
-  geom_bar(aes(Certification, fill = Certification)) +
-  theme(legend.position = "none"
-  )
-
-###Bar chart of Polish
-diamond_data %>%
-  ggplot() +
-  geom_bar(aes(Polish, fill = Polish)) +
-  theme(legend.position = "none"
+  geom_bar(aes(Carat, fill = Carat)) +
+   theme(legend.position = "none"
   )
 
 ```
@@ -163,7 +146,6 @@ anova(all.lm.fit, test="Chisq")
 model <- lm(Price~Carat + Colour + Clarity + Cut, data = diamond_data)
 
 summary(model)
-
 ```
 
 ```{r}

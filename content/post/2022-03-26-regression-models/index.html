@@ -59,6 +59,19 @@ diamond_data %&gt;% count(Carat)</code></pre>
 ##  9  0.28     2
 ## 10  0.3    154
 ## # ... with 40 more rows</code></pre>
+<pre class="r"><code>diamond_data %&gt;% count(Colour)</code></pre>
+<pre><code>## # A tibble: 9 x 2
+##   Colour     n
+##   &lt;chr&gt;  &lt;int&gt;
+## 1 D         20
+## 2 E         54
+## 3 F         58
+## 4 G         43
+## 5 H         71
+## 6 I         79
+## 7 J         72
+## 8 K         31
+## 9 L         12</code></pre>
 <pre class="r"><code>diamond_data %&gt;% count(Cut)</code></pre>
 <pre><code>## # A tibble: 5 x 2
 ##   Cut       n
@@ -81,90 +94,36 @@ diamond_data %&gt;% count(Carat)</code></pre>
 ## 7 VS2        41
 ## 8 VVS1        2
 ## 9 VVS2        5</code></pre>
-<pre class="r"><code>diamond_data %&gt;% count(Certification)</code></pre>
-<pre><code>## # A tibble: 5 x 2
-##   Certification     n
-##   &lt;chr&gt;         &lt;int&gt;
-## 1 AGS              12
-## 2 DOW               1
-## 3 EGL             119
-## 4 GIA             265
-## 5 IGI              43</code></pre>
-<pre class="r"><code>diamond_data %&gt;% count(Symmetry)</code></pre>
-<pre><code>## # A tibble: 5 x 2
-##   Symmetry     n
-##   &lt;chr&gt;    &lt;int&gt;
-## 1 F           21
-## 2 G          157
-## 3 I            5
-## 4 V          206
-## 5 X           51</code></pre>
-<pre class="r"><code>diamond_data %&gt;% count(Price)</code></pre>
-<pre><code>## # A tibble: 197 x 2
-##    Price     n
-##    &lt;dbl&gt; &lt;int&gt;
-##  1   160     6
-##  2   180    11
-##  3   190     5
-##  4   320     2
-##  5   330     6
-##  6   340     6
-##  7   360     5
-##  8   372     1
-##  9   404     1
-## 10   439     1
-## # ... with 187 more rows</code></pre>
-<pre class="r"><code>diamond_data %&gt;% count(Wholesaler)</code></pre>
-<pre><code>## # A tibble: 3 x 2
-##   Wholesaler     n
-##        &lt;dbl&gt; &lt;int&gt;
-## 1          1    60
-## 2          2   180
-## 3          3   200</code></pre>
-<pre class="r"><code>## Make graphs of the frequency of each of the variables
+<pre class="r"><code>## Make graphs of the frequency of each of the big 4 C
 
-###Bar chart of Carat
-diamond_data %&gt;%
-  ggplot() +
-  geom_bar(aes(Carat, fill = Carat)) +
-   theme(legend.position = &quot;none&quot;
-  )</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
-<pre class="r"><code>###Bar chart of Colour
+###Bar chart of Colour
 diamond_data %&gt;%
   ggplot() +
   geom_bar(aes(Colour, fill = Colour)) +
   theme(legend.position = &quot;none&quot;
   )</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-2.png" width="672" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
 <pre class="r"><code>###Bar chart of Cut
 diamond_data %&gt;%
   ggplot() +
   geom_bar(aes(Cut, fill = Cut)) +
   theme(legend.position = &quot;none&quot;
   )</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-3.png" width="672" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-2.png" width="672" /></p>
 <pre class="r"><code>###Bar chart of Clarity
 diamond_data %&gt;%
   ggplot() +
   geom_bar(aes(Clarity, fill = Clarity)) +
   theme(legend.position = &quot;none&quot;
   )</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-4.png" width="672" /></p>
-<pre class="r"><code>###Bar chart of Certification
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-3.png" width="672" /></p>
+<pre class="r"><code>###Bar chart of Carat
 diamond_data %&gt;%
   ggplot() +
-  geom_bar(aes(Certification, fill = Certification)) +
-  theme(legend.position = &quot;none&quot;
+  geom_bar(aes(Carat, fill = Carat)) +
+   theme(legend.position = &quot;none&quot;
   )</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-5.png" width="672" /></p>
-<pre class="r"><code>###Bar chart of Polish
-diamond_data %&gt;%
-  ggplot() +
-  geom_bar(aes(Polish, fill = Polish)) +
-  theme(legend.position = &quot;none&quot;
-  )</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-6.png" width="672" />
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-4.png" width="672" />
 ### From the frequency graphs, we can see that there are two main clusters of carat size represented in the data, one under 0.1-0.3 Carat, and one above 0.8 Carat.</p>
 <pre class="r"><code>### Plot of Price vs Frequency
 ggplot(diamond_data, aes(x = Price)) +
