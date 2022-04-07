@@ -90,16 +90,6 @@ diamond_data %&gt;% count(Carat)</code></pre>
 ## 3 EGL             119
 ## 4 GIA             265
 ## 5 IGI              43</code></pre>
-<pre class="r"><code>diamond_data %&gt;% count(Polish)</code></pre>
-<pre><code>## # A tibble: 6 x 2
-##   Polish     n
-##   &lt;chr&gt;  &lt;int&gt;
-## 1 F          5
-## 2 G        165
-## 3 I          5
-## 4 v          1
-## 5 V        203
-## 6 X         61</code></pre>
 <pre class="r"><code>diamond_data %&gt;% count(Symmetry)</code></pre>
 <pre><code>## # A tibble: 5 x 2
 ##   Symmetry     n
@@ -136,71 +126,64 @@ diamond_data %&gt;% count(Carat)</code></pre>
 ###Bar chart of Carat
 diamond_data %&gt;%
   ggplot() +
-  geom_bar(aes(Cut, fill = Cut)) +
-  theme(
-    axis.title.x = element_blank(),
-    legend.position = &quot;none&quot;
+  geom_bar(aes(Carat, fill = Carat)) +
+   theme(legend.position = &quot;none&quot;
   )</code></pre>
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
 <pre class="r"><code>###Bar chart of Colour
 diamond_data %&gt;%
   ggplot() +
-  geom_bar(aes(Cut, fill = Cut)) +
-  theme(
-    axis.title.x = element_blank(),
-    legend.position = &quot;none&quot;
+  geom_bar(aes(Colour, fill = Colour)) +
+  theme(legend.position = &quot;none&quot;
   )</code></pre>
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-2.png" width="672" /></p>
 <pre class="r"><code>###Bar chart of Cut
 diamond_data %&gt;%
   ggplot() +
   geom_bar(aes(Cut, fill = Cut)) +
-  theme(
-    axis.title.x = element_blank(),
-    legend.position = &quot;none&quot;
+  theme(legend.position = &quot;none&quot;
   )</code></pre>
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-3.png" width="672" /></p>
 <pre class="r"><code>###Bar chart of Clarity
 diamond_data %&gt;%
   ggplot() +
   geom_bar(aes(Clarity, fill = Clarity)) +
-  theme(
-    axis.title.x = element_blank(),
-    legend.position = &quot;none&quot;
+  theme(legend.position = &quot;none&quot;
   )</code></pre>
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-4.png" width="672" /></p>
 <pre class="r"><code>###Bar chart of Certification
 diamond_data %&gt;%
   ggplot() +
   geom_bar(aes(Certification, fill = Certification)) +
-  theme(
-    axis.title.x = element_blank(),
-    legend.position = &quot;none&quot;
+  theme(legend.position = &quot;none&quot;
   )</code></pre>
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-5.png" width="672" /></p>
 <pre class="r"><code>###Bar chart of Polish
 diamond_data %&gt;%
   ggplot() +
-  geom_bar(aes(Cut, fill = Cut)) +
-  theme(
-    axis.title.x = element_blank(),
-    legend.position = &quot;none&quot;
+  geom_bar(aes(Polish, fill = Polish)) +
+  theme(legend.position = &quot;none&quot;
   )</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-6.png" width="672" /></p>
-<pre class="r"><code>###In order to find which variables influence the </code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-6.png" width="672" />
+### From the frequency graphs, we can see that there are two main clusters of carat size represented in the data, one under 0.1-0.3 Carat, and one above 0.8 Carat.</p>
+<pre class="r"><code>### Plot of Price vs Frequency
+ggplot(diamond_data, aes(x = Price)) +
+  geom_freqpoly(binwidth = 50)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-3-1.png" width="672" />
+### There are two clusters of prices, below $1000 and above $2000 dollars. Next, we should see if cluster size is related to price.</p>
 <pre class="r"><code># Create dichotomous variable for ideal cut or higher
 diamond_data %&lt;&gt;%
   mutate(
-    avg_cut = case_when(
+    diamond_cut = case_when(
       Cut %in%
         c(&quot;F&quot;,
           &quot;G&quot;) ~
-          &quot;no&quot;,
+          &quot;less than ideal&quot;,
       Cut %in%
         c(&quot;I&quot;,
           &quot;V&quot;,
           &quot;X&quot;) ~
-          &quot;yes&quot;,
+          &quot;more than ideal&quot;,
       Cut == &quot;NA&quot; ~ &quot;NA&quot;)
   ) %&gt;%
   print()</code></pre>
@@ -217,20 +200,23 @@ diamond_data %&lt;&gt;%
 ##  8  0.84 F      SI1     G     GIA           V      V         3010          1
 ##  9  0.8  D      SI2     V     GIA           V      V         3012          1
 ## 10  0.8  D      SI2     V     GIA           V      X         3012          1
-## # ... with 430 more rows, and 1 more variable: avg_cut &lt;chr&gt;</code></pre>
+## # ... with 430 more rows, and 1 more variable: diamond_cut &lt;chr&gt;</code></pre>
 <pre class="r"><code>### get count for avg_cut
-diamond_data %&gt;% count(avg_cut)</code></pre>
+diamond_data %&gt;% count(diamond_cut)</code></pre>
 <pre><code>## # A tibble: 2 x 2
-##   avg_cut     n
-##   &lt;chr&gt;   &lt;int&gt;
-## 1 no        108
-## 2 yes       332</code></pre>
+##   diamond_cut         n
+##   &lt;chr&gt;           &lt;int&gt;
+## 1 less than ideal   108
+## 2 more than ideal   332</code></pre>
 <pre class="r"><code>### Plot of Price vs Carat size, with avg_cut overlaid
 diamond_data %&gt;%
-  filter(!is.na(avg_cut)) %&gt;%
-  ggplot(aes(x = Carat, y = Price, fill = avg_cut, color = avg_cut)) + 
+  filter(!is.na(diamond_cut)) %&gt;%
+  ggplot(aes(x = Carat, y = Price, fill = diamond_cut, color = diamond_cut)) + 
   geom_point()</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-4-1.png" width="672" />
+### We can tell from this graph that there are two distict clusters of diamonds, one of low carat diamonds at a low price range, and one of high carat diamonds at a higher price range. From this, we can tell that Carat size is a large predictor of diamond price.</p>
+<div id="additionally-through-dichotomizing-the-cut-variable-we-can-see-that-cut-is-not-a-great-predictor-of-price-as-there-were-expensive-diamonds-that-had-both-a-more-than-ideal-cut-and-a-less-than-ideal-cut.-thus-we-can-tell-that-cut-is-not-a-huge-predictor-of-diamond-price." class="section level3">
+<h3>Additionally, through dichotomizing the cut variable, we can see that cut is not a great predictor of price, as there were expensive diamonds that had both a more than ideal cut and a less than ideal cut. Thus, we can tell that Cut is not a huge predictor of diamond price.</h3>
 <pre class="r"><code># Create dichotomous variable for ideal polish or higher
 diamond_data %&lt;&gt;%
   mutate(
@@ -260,7 +246,8 @@ diamond_data %&lt;&gt;%
 ##  8  0.84 F      SI1     G     GIA           V      V         3010          1
 ##  9  0.8  D      SI2     V     GIA           V      V         3012          1
 ## 10  0.8  D      SI2     V     GIA           V      X         3012          1
-## # ... with 430 more rows, and 2 more variables: avg_cut &lt;chr&gt;, avg_polish &lt;chr&gt;</code></pre>
+## # ... with 430 more rows, and 2 more variables: diamond_cut &lt;chr&gt;,
+## #   avg_polish &lt;chr&gt;</code></pre>
 <pre class="r"><code>### get count for avg_cut
 diamond_data %&gt;% count(avg_polish)</code></pre>
 <pre><code>## # A tibble: 3 x 2
@@ -269,85 +256,18 @@ diamond_data %&gt;% count(avg_polish)</code></pre>
 ## 1 no           170
 ## 2 yes          269
 ## 3 &lt;NA&gt;           1</code></pre>
-<pre class="r"><code>### Plot of Price vs Carat size, with avg_polish overlaid overlaid
+<pre class="r"><code>### Plot of Price vs Polish
 diamond_data %&gt;%
   filter(!is.na(avg_polish)) %&gt;%
   ggplot(aes(x = Wholesaler, y = Price, fill = avg_polish, color = avg_polish)) + 
   geom_point()</code></pre>
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
-<pre class="r"><code>## Wholesaler 1 seems to have the highest quality of polish among the three sellers.</code></pre>
-<pre class="r"><code># Create dichotomous variable for ideal symmetry or higher
-diamond_data %&lt;&gt;%
-  mutate(
-    avg_sym = case_when(
-      Symmetry %in%
-        c(&quot;F&quot;,
-          &quot;G&quot;) ~
-          &quot;no&quot;,
-      Symmetry %in%
-        c(&quot;I&quot;,
-          &quot;V&quot;,
-          &quot;X&quot;) ~
-          &quot;yes&quot;,
-      Symmetry == &quot;NA&quot; ~ &quot;NA&quot;)
-  ) %&gt;%
-  print()</code></pre>
-<pre><code>## # A tibble: 440 x 12
-##    Carat Colour Clarity Cut   Certification Polish Symmetry Price Wholesaler
-##    &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt;         &lt;chr&gt;  &lt;chr&gt;    &lt;dbl&gt;      &lt;dbl&gt;
-##  1  0.92 I      SI2     G     AGS           V      V         3000          1
-##  2  0.92 I      SI2     V     AGS           G      G         3000          1
-##  3  0.82 F      SI2     I     GIA           X      X         3004          1
-##  4  0.81 G      SI1     I     GIA           X      V         3004          1
-##  5  0.9  J      VS2     V     GIA           V      V         3006          1
-##  6  0.87 F      SI2     I     AGS           G      V         3007          1
-##  7  0.8  D      SI2     I     GIA           V      V         3008          1
-##  8  0.84 F      SI1     G     GIA           V      V         3010          1
-##  9  0.8  D      SI2     V     GIA           V      V         3012          1
-## 10  0.8  D      SI2     V     GIA           V      X         3012          1
-## # ... with 430 more rows, and 3 more variables: avg_cut &lt;chr&gt;,
-## #   avg_polish &lt;chr&gt;, avg_sym &lt;chr&gt;</code></pre>
-<pre class="r"><code>### get count for avg_cut
-diamond_data %&gt;% count(avg_sym)</code></pre>
-<pre><code>## # A tibble: 2 x 2
-##   avg_sym     n
-##   &lt;chr&gt;   &lt;int&gt;
-## 1 no        178
-## 2 yes       262</code></pre>
-<pre class="r"><code>### Plot of Price vs Carat size, with avg_polish overlaid overlaid
-diamond_data %&gt;%
-  filter(!is.na(avg_sym)) %&gt;%
-  ggplot(aes(x = Carat, y = Price, fill = avg_sym, color = avg_sym)) + 
+<pre class="r"><code>diamond_data %&gt;%
+  ggplot(aes(x = Polish, y = Price)) + 
   geom_point()</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
-<pre class="r"><code>## The factors with a large influence on price seem to be Carat and Cut
-##Linear regression model using Carat and Cut
-
-cut.carat.lm.fit &lt;- lm(Price~Cut + Carat, data = diamond_data)
-summary(cut.carat.lm.fit)</code></pre>
-<pre><code>## 
-## Call:
-## lm(formula = Price ~ Cut + Carat, data = diamond_data)
-## 
-## Residuals:
-##      Min       1Q   Median       3Q      Max 
-## -1572.73  -247.88    -6.91   232.39   950.66 
-## 
-## Coefficients:
-##             Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)  -599.30      80.71  -7.425 6.02e-13 ***
-## CutG          314.30      82.27   3.820 0.000153 ***
-## CutI          471.11      74.61   6.314 6.71e-10 ***
-## CutV          457.30      77.03   5.937 5.96e-09 ***
-## CutX          172.33      67.21   2.564 0.010682 *  
-## Carat        3032.93      59.03  51.382  &lt; 2e-16 ***
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-## 
-## Residual standard error: 419.4 on 434 degrees of freedom
-## Multiple R-squared:  0.8742, Adjusted R-squared:  0.8728 
-## F-statistic: 603.3 on 5 and 434 DF,  p-value: &lt; 2.2e-16</code></pre>
-<p>###The r squared value of this regression model is 0.8742, so this is a fairly accurate model.</p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-5-2.png" width="672" />
+## We can see that polish does not seem to correlate with price point that much, as there are diamonds of different polishes at all price points.
+## Wholesaler 1 seems to have the highest quality of polish among the three sellers.</p>
 <pre class="r"><code>##Linear Regression Model w all variables
 
 all.lm.fit &lt;- lm(Price~Carat + Colour + Clarity + Cut + Certification + Polish + Symmetry, data = diamond_data)
@@ -404,18 +324,77 @@ summary(all.lm.fit)</code></pre>
 ## Residual standard error: 197.2 on 406 degrees of freedom
 ## Multiple R-squared:  0.974,  Adjusted R-squared:  0.9719 
 ## F-statistic: 460.4 on 33 and 406 DF,  p-value: &lt; 2.2e-16</code></pre>
-<p>##The R squared value of this model is 0.972, so this is a very accurate linear regression model.</p>
+<p>##The R squared value of this model is 0.972, so this is a very accurate linear regression model.
+## Coduct an Anova test in order to see which variables are the most significant predictors of price</p>
+<pre class="r"><code>anova(all.lm.fit, test=&quot;Chisq&quot;)</code></pre>
+<pre><code>## Analysis of Variance Table
+## 
+## Response: Price
+##                Df    Sum Sq   Mean Sq    F value    Pr(&gt;F)    
+## Carat           1 519687583 519687583 13360.8061 &lt; 2.2e-16 ***
+## Colour          8  10605862   1325733    34.0837 &lt; 2.2e-16 ***
+## Clarity         8  53866928   6733366   173.1102 &lt; 2.2e-16 ***
+## Cut             4   1395625    348906     8.9701 5.978e-07 ***
+## Certification   4   4806401   1201600    30.8923 &lt; 2.2e-16 ***
+## Polish          5    498784     99757     2.5647   0.02666 *  
+## Symmetry        3    152390     50797     1.3059   0.27204    
+## Residuals     406  15791948     38896                         
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+</div>
+<div id="looking-at-the-prf-tells-us-the-p-value-or-the-significance-associated-with-each-of-the-variables.-from-the-anova-test-we-can-tell-that-carat-colour-clarity-and-cut-have-the-greatest-significance-when-it-comes-to-predicting-diamond-price-and-so-these-will-be-the-variables-that-we-include-in-our-linear-regression-model." class="section level3">
+<h3>Looking at the Pr(&gt;F) tells us the p value, or the significance, associated with each of the variables. From the Anova test, we can tell that Carat, Colour, Clarity, and Cut have the greatest significance when it comes to predicting diamond price, and so these will be the variables that we include in our linear regression model.</h3>
+<pre class="r"><code>##regression model using Carat, Colour and Clarity
+model &lt;- lm(Price~Carat + Colour + Clarity + Cut, data = diamond_data)
+
+summary(model)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Price ~ Carat + Colour + Clarity + Cut, data = diamond_data)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -871.84 -113.74  -30.85  153.66  758.43 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -1262.96      75.10 -16.817  &lt; 2e-16 ***
+## Carat        4021.16      47.87  84.007  &lt; 2e-16 ***
+## ColourE      -222.88      60.13  -3.707 0.000238 ***
+## ColourF      -326.58      59.66  -5.474 7.59e-08 ***
+## ColourG      -267.34      61.47  -4.349 1.72e-05 ***
+## ColourH      -455.52      58.73  -7.756 6.75e-14 ***
+## ColourI      -512.56      58.61  -8.746  &lt; 2e-16 ***
+## ColourJ      -729.74      60.22 -12.119  &lt; 2e-16 ***
+## ColourK     -1004.86      68.61 -14.645  &lt; 2e-16 ***
+## ColourL     -1138.90      86.13 -13.224  &lt; 2e-16 ***
+## ClarityI2    -593.78      50.17 -11.835  &lt; 2e-16 ***
+## ClaritySI1    955.49      46.18  20.691  &lt; 2e-16 ***
+## ClaritySI2    812.39      38.59  21.052  &lt; 2e-16 ***
+## ClaritySI3    236.55      52.83   4.477 9.77e-06 ***
+## ClarityVS1   1187.11      61.77  19.219  &lt; 2e-16 ***
+## ClarityVS2   1039.77      56.81  18.304  &lt; 2e-16 ***
+## ClarityVVS1  1431.16     173.41   8.253 2.04e-15 ***
+## ClarityVVS2  1031.59     111.48   9.254  &lt; 2e-16 ***
+## CutG          103.69      45.47   2.280 0.023083 *  
+## CutI          190.10      41.93   4.533 7.59e-06 ***
+## CutV          204.53      43.15   4.740 2.93e-06 ***
+## CutX          150.08      36.85   4.073 5.54e-05 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 225.5 on 418 degrees of freedom
+## Multiple R-squared:  0.965,  Adjusted R-squared:  0.9632 
+## F-statistic: 548.5 on 21 and 418 DF,  p-value: &lt; 2.2e-16</code></pre>
 <pre class="r"><code>##Conduct the regression model using our professor&#39;s given data
 professors_ring &lt;- data.frame(Carat = 0.9, Colour = &quot;J&quot;, Clarity = &quot;SI2&quot;, Cut = &quot;V&quot;, Certification = &quot;GIA&quot;, Polish = &quot;G&quot;, Symmetry = &quot;V&quot;)
 
-predict(cut.carat.lm.fit, professors_ring)</code></pre>
-<pre><code>##        1 
-## 2587.634</code></pre>
-<pre class="r"><code>predict(all.lm.fit, professors_ring)</code></pre>
-<pre><code>## Warning in predict.lm(all.lm.fit, professors_ring): prediction from a rank-
-## deficient fit may be misleading</code></pre>
-<pre><code>##        1 
-## 2797.542</code></pre>
+predict(model, professors_ring)</code></pre>
+<pre><code>##       1 
+## 2643.27</code></pre>
+</div>
+<div id="the-professor-should-be-paying-around-2643.27-for-his-ring-although-this-does-not-include-the-price-of-the-ring-only-the-diamond.-the-price-of-3100-that-he-was-given-for-his-ring-of-interest-is-too-high-and-he-may-be-being-overcharged.-the-professor-should-budget-around-2800---3000-for-his-diamond-ring-depending-on-how-fancy-of-a-ring-band-he-wants." class="section level3">
+<h3>The professor should be paying around $2643.27 for his ring, although this does not include the price of the ring, only the diamond. The price of $3100 that he was given for his ring of interest is too high and he may be being overcharged. The professor should budget around $2800 - $3000 for his diamond ring, depending on how fancy of a ring band he wants.</h3>
 <pre class="r"><code>## Second method: Bootstrapping
 
 set.seed(1)
@@ -436,3 +415,4 @@ boot.fn &lt;- function(data, index) {
 boot.out &lt;- boot(diamond_data, boot.fn, 500)
 plot(boot.out)</code></pre>
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+</div>

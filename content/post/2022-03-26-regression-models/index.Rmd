@@ -22,7 +22,6 @@ diamond_data %>% count(Carat)
 diamond_data %>% count(Cut)
 diamond_data %>% count(Clarity)
 diamond_data %>% count(Certification)
-diamond_data %>% count(Polish)
 diamond_data %>% count(Symmetry)
 diamond_data %>% count(Price)
 diamond_data %>% count(Wholesaler)
@@ -33,95 +32,84 @@ diamond_data %>% count(Wholesaler)
 ###Bar chart of Carat
 diamond_data %>%
   ggplot() +
-  geom_bar(aes(Cut, fill = Cut)) +
-  theme(
-    axis.title.x = element_blank(),
-    legend.position = "none"
+  geom_bar(aes(Carat, fill = Carat)) +
+   theme(legend.position = "none"
   )
 
 ###Bar chart of Colour
 diamond_data %>%
   ggplot() +
-  geom_bar(aes(Cut, fill = Cut)) +
-  theme(
-    axis.title.x = element_blank(),
-    legend.position = "none"
+  geom_bar(aes(Colour, fill = Colour)) +
+  theme(legend.position = "none"
   )
 
 ###Bar chart of Cut
 diamond_data %>%
   ggplot() +
   geom_bar(aes(Cut, fill = Cut)) +
-  theme(
-    axis.title.x = element_blank(),
-    legend.position = "none"
+  theme(legend.position = "none"
   )
 
 ###Bar chart of Clarity
 diamond_data %>%
   ggplot() +
   geom_bar(aes(Clarity, fill = Clarity)) +
-  theme(
-    axis.title.x = element_blank(),
-    legend.position = "none"
+  theme(legend.position = "none"
   )
 
 ###Bar chart of Certification
 diamond_data %>%
   ggplot() +
   geom_bar(aes(Certification, fill = Certification)) +
-  theme(
-    axis.title.x = element_blank(),
-    legend.position = "none"
+  theme(legend.position = "none"
   )
 
 ###Bar chart of Polish
 diamond_data %>%
   ggplot() +
-  geom_bar(aes(Cut, fill = Cut)) +
-  theme(
-    axis.title.x = element_blank(),
-    legend.position = "none"
+  geom_bar(aes(Polish, fill = Polish)) +
+  theme(legend.position = "none"
   )
 
-
 ```
-
-
+### From the frequency graphs, we can see that there are two main clusters of carat size represented in the data, one under 0.1-0.3 Carat, and one above 0.8 Carat.
 ```{r}
-###In order to find which variables influence the 
-
-
-
+### Plot of Price vs Frequency
+ggplot(diamond_data, aes(x = Price)) +
+  geom_freqpoly(binwidth = 50)
 ```
-
+### There are two clusters of prices, below $1000 and above $2000 dollars. Next, we should see if cluster size is related to price.
 ```{r}
 # Create dichotomous variable for ideal cut or higher
 diamond_data %<>%
   mutate(
-    avg_cut = case_when(
+    diamond_cut = case_when(
       Cut %in%
         c("F",
           "G") ~
-          "no",
+          "less than ideal",
       Cut %in%
         c("I",
           "V",
           "X") ~
-          "yes",
+          "more than ideal",
       Cut == "NA" ~ "NA")
   ) %>%
   print()
 
 ### get count for avg_cut
-diamond_data %>% count(avg_cut)
+diamond_data %>% count(diamond_cut)
 
 ### Plot of Price vs Carat size, with avg_cut overlaid
 diamond_data %>%
-  filter(!is.na(avg_cut)) %>%
-  ggplot(aes(x = Carat, y = Price, fill = avg_cut, color = avg_cut)) + 
+  filter(!is.na(diamond_cut)) %>%
+  ggplot(aes(x = Carat, y = Price, fill = diamond_cut, color = diamond_cut)) + 
   geom_point()
+
 ```
+### We can tell from this graph that there are two distict clusters of diamonds, one of low carat diamonds at a low price range, and one of high carat diamonds at a higher price range. From this, we can tell that Carat size is a large predictor of diamond price.
+
+### Additionally, through dichotomizing the cut variable, we can see that cut is not a great predictor of price, as there were expensive diamonds that had both a more than ideal cut and a less than ideal cut. Thus, we can tell that Cut is not a huge predictor of diamond price.
 
 ```{r}
 # Create dichotomous variable for ideal polish or higher
@@ -144,50 +132,19 @@ diamond_data %<>%
 ### get count for avg_cut
 diamond_data %>% count(avg_polish)
 
-### Plot of Price vs Carat size, with avg_polish overlaid overlaid
+### Plot of Price vs Polish
 diamond_data %>%
   filter(!is.na(avg_polish)) %>%
   ggplot(aes(x = Wholesaler, y = Price, fill = avg_polish, color = avg_polish)) + 
   geom_point()
 
-## Wholesaler 1 seems to have the highest quality of polish among the three sellers.
-```
-```{r}
-# Create dichotomous variable for ideal symmetry or higher
-diamond_data %<>%
-  mutate(
-    avg_sym = case_when(
-      Symmetry %in%
-        c("F",
-          "G") ~
-          "no",
-      Symmetry %in%
-        c("I",
-          "V",
-          "X") ~
-          "yes",
-      Symmetry == "NA" ~ "NA")
-  ) %>%
-  print()
-
-### get count for avg_cut
-diamond_data %>% count(avg_sym)
-
-### Plot of Price vs Carat size, with avg_polish overlaid overlaid
 diamond_data %>%
-  filter(!is.na(avg_sym)) %>%
-  ggplot(aes(x = Carat, y = Price, fill = avg_sym, color = avg_sym)) + 
+  ggplot(aes(x = Polish, y = Price)) + 
   geom_point()
 ```
+## We can see that polish does not seem to correlate with price point that much, as there are diamonds of different polishes at all price points. 
+## Wholesaler 1 seems to have the highest quality of polish among the three sellers.
 
-```{r}
-## The factors with a large influence on price seem to be Carat and Cut
-##Linear regression model using Carat and Cut
-
-cut.carat.lm.fit <- lm(Price~Cut + Carat, data = diamond_data)
-summary(cut.carat.lm.fit)
-```
-###The r squared value of this regression model is 0.8742, so this is a fairly accurate model.
 ```{r}
 ##Linear Regression Model w all variables
 
@@ -195,13 +152,27 @@ all.lm.fit <- lm(Price~Carat + Colour + Clarity + Cut + Certification + Polish +
 summary(all.lm.fit)
 ```
 ##The R squared value of this model is 0.972, so this is a very accurate linear regression model.
+## Coduct an Anova test in order to see which variables are the most significant predictors of price
+```{r}
+anova(all.lm.fit, test="Chisq")
+```
+### Looking at the Pr(>F) tells us the p value, or the significance, associated with each of the variables. From the Anova test, we can tell that Carat, Colour, Clarity, and Cut have the greatest significance when it comes to predicting diamond price, and so these will be the variables that we include in our linear regression model. 
+
+```{r}
+##regression model using Carat, Colour and Clarity
+model <- lm(Price~Carat + Colour + Clarity + Cut, data = diamond_data)
+
+summary(model)
+
+```
+
 ```{r}
 ##Conduct the regression model using our professor's given data
 professors_ring <- data.frame(Carat = 0.9, Colour = "J", Clarity = "SI2", Cut = "V", Certification = "GIA", Polish = "G", Symmetry = "V")
 
-predict(cut.carat.lm.fit, professors_ring)
-predict(all.lm.fit, professors_ring)
+predict(model, professors_ring)
 ```
+### The professor should be paying around $2643.27 for his ring, although this does not include the price of the ring, only the diamond. The price of $3100 that he was given for his ring of interest is too high and he may be being overcharged. The professor should budget around $2800 - $3000 for his diamond ring, depending on how fancy of a ring band he wants. 
 ```{r}
 ## Second method: Bootstrapping
 
