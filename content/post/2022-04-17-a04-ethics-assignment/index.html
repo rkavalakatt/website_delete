@@ -1,0 +1,77 @@
+---
+title: A04 Ethics Assignment
+author: ''
+date: '2022-04-17'
+slug: a04-ethics-assignment
+categories: []
+tags: []
+---
+
+<script src="{{< blogdown/postref >}}index_files/header-attrs/header-attrs.js"></script>
+
+
+<div id="what-is-misleading-about-the-appended-visualization-and-how-you-might-go-about-fixing-it.-follow-the-guidelines-to-answer-the-question" class="section level3">
+<h3>1) What is misleading about the appended visualization and how you might go about fixing it. Follow the guidelines to answer the question</h3>
+</div>
+<div id="the-graph-is-misleading-because-each-variable-that-is-plotted-has-a-different-scale.-the-problemw-ith-dual-axis-graphs-such-as-this-one-is-that-if-the-scale-of-each-axis-is-different-it-might-not-be-immediately-obvious-to-the-viewer-and-can-make-it-hard-for-most-people-to-intuitively-make-correct-conclusions-comparing-the-two-variables-plotted." class="section level3">
+<h3>The graph is misleading because each variable that is plotted has a different scale. The problemw ith dual-axis graphs, such as this one, is that if the scale of each axis is different, it might not be immediately obvious to the viewer, and can make it hard for most people to intuitively make correct conclusions comparing the two variables plotted.</h3>
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>## -- Attaching packages --------------------------------------- tidyverse 1.3.1 --</code></pre>
+<pre><code>## v ggplot2 3.3.5     v purrr   0.3.4
+## v tibble  3.1.6     v dplyr   1.0.7
+## v tidyr   1.2.0     v stringr 1.4.0
+## v readr   2.1.2     v forcats 0.5.1</code></pre>
+<pre><code>## -- Conflicts ------------------------------------------ tidyverse_conflicts() --
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>library(ggplot2)
+library(dplyr)</code></pre>
+<pre class="r"><code>mask_data &lt;- tribble(
+  ~Date, ~No.Mask, ~Mask,
+  &quot;2020-7-12&quot;, 9.7, 25.4,
+  &quot;2020-7-13&quot;, 9.1, 19.8,
+  &quot;2020-7-14&quot;, 9.4, 19.7,
+  &quot;2020-7-15&quot;, 9.7, 20.4,
+  &quot;2020-7-16&quot;, 9.6, 20.1,
+  &quot;2020-7-17&quot;, 9.6, 20.1,
+  &quot;2020-7-18&quot;, 9.0, 20.4,
+  &quot;2020-7-19&quot;, 8.7, 20.0,
+  &quot;2020-7-20&quot;, 8.9, 20.6,
+  &quot;2020-7-21&quot;, 9.0, 21.6,
+  &quot;2020-7-22&quot;, 8.7, 19.8,
+  &quot;2020-7-23&quot;, 9.9, 19.9,
+  &quot;2020-7-24&quot;, 9.9, 20.5,
+  &quot;2020-7-25&quot;, 10.1, 19.0, 
+  &quot;2020-7-26&quot;, 9.7, 19.6,
+  &quot;2020-7-27&quot;, 9.7, 17.0,
+  &quot;2020-7-28&quot;, 9.7, 16.4,
+  &quot;2020-7-29&quot;, 10.1, 16.7, 
+  &quot;2020-7-30&quot;, 9.8, 16.7,
+  &quot;2020-7-31&quot;, 10.0, 16.0,
+  &quot;2020-8-1&quot;, 9.2, 16.3,
+  &quot;2020-8-2&quot;, 9.1, 16.1,
+  &quot;2020-8-3&quot;, 9.5, 16.0
+)</code></pre>
+</div>
+<div id="plot-the-data" class="section level2">
+<h2>Plot the data</h2>
+<pre class="r"><code>ggplot(mask_data, aes(x = Date, y = value, color = variable)) + 
+    geom_point(aes(y = Mask, col = &quot;Mask&quot;)) + 
+    geom_point(aes(y = No.Mask, col = &quot;No.Mask&quot;)) +
+    labs(title = &quot;Kansas Covid-19 7-Day Rolling Average of Daily Cases / 100K Population&quot;, 
+       subtitle = &quot;Masked Vs Nonmasked Countries&quot;,
+         x=&quot;Date&quot;, y = &quot;Avg Cases / 100k Pop&quot;) +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-3-1.png" width="672" />
+##What message is more clear in your visualization than it was in the original visualization?</p>
+<pre class="r"><code>###In the original visualization, it misrepresented the rate of Covid-19 cases in masked counties to make it seem like it was lower than in masked counties. My visualization shows that the number of total number of average cases in counties without masks are lower overall, but the rate of decrease of average case count is faster in counties with masks.</code></pre>
+<p>##What useful information do these data and your visualization tell us about mask wearing and COVID?</p>
+<pre class="r"><code>### This tells us important information about the effectiveness of mask wearing in preventing the spread of COVID-19 and lowering the number of daily average cases. From the visualization, we can see that while the overall number of daily average cases was higher in masked counties, the average daily case count is decreasing over time in these counties, showing that masks are effective at slowing the spread of COVID-19. In counties that did not use masks, the daily average for Covid cases stayed roughly consistent over time. An important thing to note is that the original visualization wanted to hide the fact that in unmasked counties, daily average Covid case counts were significantly lower than in masked counties. This was probably because whoever created this visualization wanted to encourage people to wear masks, and not assume that unmasked counties were safer.</code></pre>
+</div>
+<div id="video-review" class="section level2">
+<h2>Video Review</h2>
+<div id="joy-boulamwini-explains-her-quest-to-fight-bias-in-algorithms.-algorithmic-bias-can-lead-to-exclusionary-experiences-and-discriminatory-practices.-for-example-in-facial-recognition-algorithms-white-faces-are-more-easily-recognizable-than-faces-of-other-races.-in-testing-her-projects-she-found-that-it-was-harder-to-train-her-models-using-faces-of-colors-and-easier-to-train-models-using-white-faces.-this-is-because-there-is-racial-bias-built-into-generic-facial-recognition-softwares-because-they-do-not-use-inclusion-training-sets.-these-algorithms-then-become-the-basis-of-projects-and-startup-companies-around-the-world-spreading-algorithmic-bias-even-further.-full-spectrum-inclusion-is-very-important-in-order-to-capture-a-more-complete-picture-of-humanity.-this-becomes-increasingly-important-as-facial-recognition-software-is-being-employed-by-police-departments-to-catch-criminals-resulting-in-the-bias-built-into-our-software-seeping-into-our-justice-system-and-contribute-to-people-of-color-being-wrongly-convicted-of-crimes.-as-more-and-more-of-decision-making-becomes-automated-in-everything-from-government-to-college-admissions-flawed-coding-can-impact-millions-of-lives.-the-incoding-movement-strives-to-focus-on-identifying-bias-curating-inclusive-trianing-sets-and-thinking-more-about-the-social-impact-of-our-code.-who-codes-how-we-code-and-why-we-code-matters." class="section level3">
+<h3>Joy Boulamwini explains her quest to fight bias in algorithms. Algorithmic bias can lead to exclusionary experiences and discriminatory practices. For example, in facial recognition algorithms, white faces are more easily recognizable than faces of other races. In testing her projects, she found that it was harder to train her models using faces of colors, and easier to train models using white faces. This is because there is racial bias built into generic facial recognition softwares, because they do not use inclusion training sets. These algorithms then become the basis of projects and startup companies around the world, spreading algorithmic bias even further. Full spectrum inclusion is very important in order to capture a more complete picture of humanity. This becomes increasingly important as facial recognition software is being employed by police departments to catch criminals, resulting in the bias built into our software seeping into our justice system and contribute to people of color being wrongly convicted of crimes. As more and more of decision-making becomes automated in everything from government to college admissions, flawed coding can impact millions of lives. The incoding movement strives to focus on identifying bias, curating inclusive trianing sets, and thinking more about the social impact of our code. Who codes, how we code, and why we code matters.</h3>
+<p>##Datacamp Certificate of Completion</p>
+</div>
+</div>
