@@ -72,3 +72,8 @@ ggplot(mask_data, aes(x = Date, y = value, color = variable)) +
 ### Joy Boulamwini explains her quest to fight bias in algorithms. Algorithmic bias can lead to exclusionary experiences and discriminatory practices. For example, in facial recognition algorithms, white faces are more easily recognizable than faces of other races. In testing her projects, she found that it was harder to train her models using faces of colors, and easier to train models using white faces. This is because there is racial bias built into generic facial recognition softwares, because they do not use inclusion training sets. These algorithms then become the basis of projects and startup companies around the world, spreading algorithmic bias even further. Full spectrum inclusion is very important in order to capture a more complete picture of humanity. This becomes increasingly important as facial recognition software is being employed by police departments to catch criminals, resulting in the bias built into our software seeping into our justice system and contribute to people of color being wrongly convicted of crimes. As more and more of decision-making becomes automated in everything from government to college admissions, flawed coding can impact millions of lives. The incoding movement strives to focus on identifying bias, curating inclusive trianing sets, and thinking more about the social impact of our code. Who codes, how we code, and why we code matters. 
 
 ##Datacamp Certificate of Completion
+
+![Datacamp Certificate of Completion](images/datacamp.jpg)
+
+
+
